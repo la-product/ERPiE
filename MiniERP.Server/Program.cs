@@ -9,9 +9,9 @@ public class Program {
     public static void Main(string[] args) {
         var builder = WebApplication.CreateBuilder(args);
 
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-        builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+        var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+        var monsterConn = builder.Configuration.GetConnectionString("DefaultConnection").Replace("${DB_PASSWORD}", dbPassword);
+        builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(monsterConn, ServerVersion.AutoDetect(monsterConn)));
         builder.Services.AddIdentity<User, IdentityRole>(options => {
             options.Password.RequireDigit = false;
             options.Password.RequiredLength = 4;

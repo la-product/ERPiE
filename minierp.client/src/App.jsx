@@ -19,7 +19,7 @@ function App() {
     };
 
     const handleLogout = () => {
-        // Volitelně můžeme zavolat API, ale pro demo stačí vymazat stav
+        
         fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
         setUser(null);
         setIsAuthenticated(false);
@@ -45,12 +45,12 @@ function App() {
 
     const renderPage = () => {
         switch (activePage) {
-            case 'Customer list': return <Customers view="list" />;
-            case 'Add customer': return <Customers view="add" />;
-            case 'Product list': return <Products view="list" products={products} setProducts={setProducts} loading={productsLoading} setLoading={setProductsLoading} />;
-            case 'Add product': return <Products view="add" products={products} setProducts={setProducts} loading={productsLoading} setLoading={setProductsLoading} />;
-            case 'Order list': return <Orders view="list" products={products} setProducts={setProducts} />;
-            case 'Add order': return <Orders view="add" products={products} setProducts={setProducts} />;
+            case 'Customer list': return <Customers view="list" setActivePage={setActivePage} />;
+            case 'Add customer': return <Customers view="add" setActivePage={setActivePage} />;
+            case 'Product list': return <Products view="list" products={products} setProducts={setProducts} loading={productsLoading} setLoading={setProductsLoading} setActivePage={setActivePage} />;
+            case 'Add product': return <Products view="add" products={products} setProducts={setProducts} loading={productsLoading} setLoading={setProductsLoading} setActivePage={setActivePage} />;
+            case 'Order list': return <Orders view="list" products={products} setProducts={setProducts} setActivePage={setActivePage} />;
+            case 'Add order': return <Orders view="add" products={products} setProducts={setProducts} setActivePage={setActivePage} />;
             case 'Invoice list': return <Invoices view="list" />;
             case 'Add invoice': return <Invoices view="add" />;
             case 'User list': return user?.role === 'Admin' ? <Users view="list" /> : null;

@@ -13,6 +13,7 @@ MiniERP.Client/dist/
 MiniERP.Client/.env
 MiniERP.Client/.env.local
 MiniERP.Client/.env*.local
+poznamky.md
 
 # Obecné
 .DS_Store

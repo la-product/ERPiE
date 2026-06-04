@@ -4,7 +4,7 @@ import { getOrders, createOrder, updateOrderStatus, deleteOrder, getOrderById } 
 import { getProductDisplayText } from "../mappers/productMapper";
 import InvoiceForm from "./InvoiceForm";
 
-function Orders({ view, products }) {
+function Orders({ view, products, setActivePage }) {
     const [customers, setCustomers] = useState([]);
     const [orders, setOrders] = useState([]);
     const [selectedOrder, setSelectedOrder] = useState(null);
@@ -183,7 +183,7 @@ function Orders({ view, products }) {
             <div>
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h4 className="fw-bold mb-0">New Order</h4>
-                    <button className="btn btn-outline-secondary" onClick={() => (window.location.hash = "#/orders")}>
+                    <button className="btn btn-outline-secondary" onClick={() => setActivePage('Order list')}>
                         <i className="bi bi-arrow-left me-2"></i>Back to List
                     </button>
                 </div>
@@ -390,7 +390,7 @@ function Orders({ view, products }) {
         <div>
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h4 className="fw-bold mb-0">List of Orders</h4>
-                <button className="btn btn-primary" onClick={() => window.location.hash = '#/orders/add'}>
+                <button className="btn btn-primary" onClick={() => setActivePage('Add order')}>
                     <i className="bi bi-plus-lg me-2"></i>New Order
                 </button>
             </div>

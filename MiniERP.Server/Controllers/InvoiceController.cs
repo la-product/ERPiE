@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MiniERP.Server.Data;
 using MiniERP.Server.DTOs;
 using MiniERP.Server.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MiniERP.Server.Controllers;
 

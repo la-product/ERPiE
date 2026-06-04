@@ -1,15 +1,19 @@
 import { useCallback, useEffect, useState } from "react";
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import {
     getCustomers,
     addCustomer,
     updateCustomer,
     deleteCustomer,
+   
 } from "../services/customerService";
 import {
     mapCustomerDtoToForm
 } from "../mappers/customerMapper";
+import { useNavigate } from 'react-router-dom';
 
-function Customers({ view }) {
+
+function Customers({ view, setActivePage }) {
     const [customers, setCustomers] = useState([]);
     const [form, setForm] = useState({
         name: "",
@@ -23,6 +27,7 @@ function Customers({ view }) {
     const [editForm, setEditForm] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+   
 
     const loadCustomers = useCallback(async () => {
         try {
@@ -94,7 +99,7 @@ function Customers({ view }) {
             <div>
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h4 className="fw-bold mb-0">Add Customer</h4>
-                    <button className="btn btn-outline-secondary" onClick={() => (window.location.hash = "#/customers")}>
+                    <button className="btn btn-outline-secondary" onClick={() => setActivePage('Customer list')}>
                         <i className="bi bi-arrow-left me-2"></i>Back to List
                     </button>
                 </div>
@@ -288,7 +293,7 @@ function Customers({ view }) {
             )}
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h4 className="fw-bold mb-0">Customer List</h4>
-                <button className="btn btn-primary" onClick={() => window.location.hash = '#/customers/add'}>
+                <button className="btn btn-primary" onClick={() => setActivePage('Add customer')}>
                     <i className="bi bi-plus-lg me-2"></i>New Customer
                 </button>
             </div>

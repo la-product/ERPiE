@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { getProducts, addProduct, updateProduct, deleteProduct } from '../services/productService';
 import { mapProductDtoToForm, getProductDisplayText } from '../mappers/productMapper';
 
-function Products({ view, products, setProducts, loading, setLoading }) {
+function Products({ view, products, setProducts, loading, setLoading, setActivePage }) {
     const [form, setForm] = useState({ size: '', brand: '', pattern: '', si: '', li: '', netPrice: '', stock: '' });
     const [showModal, setShowModal] = useState(false);
     const [editForm, setEditForm] = useState({});
@@ -71,7 +71,7 @@ function Products({ view, products, setProducts, loading, setLoading }) {
             <div>
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h4 className="fw-bold mb-0">Add Product</h4>
-                    <button className="btn btn-outline-secondary" onClick={() => (window.location.hash = "#/products")}>
+                    <button className="btn btn-outline-secondary" onClick={() => setActivePage('Product list')}>
                         <i className="bi bi-arrow-left me-2"></i>Back to List
                     </button>
                 </div>
@@ -209,7 +209,7 @@ function Products({ view, products, setProducts, loading, setLoading }) {
             )}
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h4 className="fw-bold mb-0">Product List</h4>
-                <button className="btn btn-primary" onClick={() => window.location.hash = '#/products/add'}>
+                <button className="btn btn-primary" onClick={() => setActivePage('Add product') }>
                     <i className="bi bi-plus-lg me-2"></i>New Product
                 </button>
             </div>

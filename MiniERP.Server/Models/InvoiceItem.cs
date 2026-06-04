@@ -15,4 +15,5 @@ public class InvoiceItem {
     public decimal VatRate { get; set; }
     public decimal TotalPrice { get; set; }
 
+
 }

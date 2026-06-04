@@ -29,6 +29,7 @@ public class InvoiceController : ControllerBase {
             DueDate = i.DueDate,
             Status = i.Status,
             CustomerId = i.CustomerId,
+            CustomerName = i.Customer.Name,
             TotalAmountExVat = i.TotalAmountExVat,
             VatAmount = i.VatAmount,
             TotalAmountIncVat = i.TotalAmountIncVat,

@@ -7,6 +7,7 @@ public class InvoiceDTO
     public DateOnly DueDate { get; set; }
     public string Status { get; set; } = string.Empty;
     public int CustomerId { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
     public decimal TotalAmountExVat { get; set; }
     public decimal VatAmount { get; set; }
     public decimal TotalAmountIncVat { get; set; }

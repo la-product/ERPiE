@@ -2,12 +2,14 @@ import { useState, useCallback, useEffect } from "react";
 import { getCustomers } from "../services/customerService";
 import { getOrders, createOrder, updateOrderStatus, deleteOrder, getOrderById } from "../services/orderService";
 import { getProductDisplayText } from "../mappers/productMapper";
+import InvoiceForm from "./InvoiceForm";
 
 function Orders({ view, products }) {
     const [customers, setCustomers] = useState([]);
     const [orders, setOrders] = useState([]);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [showInvoiceForm, setShowInvoiceForm] = useState(false);
     const [form, setForm] = useState({
         customerId: '',
         street: '',
@@ -24,6 +26,7 @@ function Orders({ view, products }) {
     });
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [modalView, setModalView] = useState('details');
 
     const getStatusBadgeClass = (status) => {
         switch (status) {
@@ -123,6 +126,7 @@ function Orders({ view, products }) {
         try {
             const detail = await getOrderById(order.id);
             setSelectedOrder(detail);
+            setModalView('details');
             setShowModal(true);
         } catch (err) {
             setError(err.message);
@@ -160,6 +164,18 @@ function Orders({ view, products }) {
                 setError(err.message);
             }
         }
+    };
+
+    const handleOpenInvoiceForm = () => {
+        setShowInvoiceForm(true);
+    };
+
+    const handleCloseInvoiceForm = () => {
+        setShowInvoiceForm(false);
+    };
+
+    const handleInvoiceSuccess = () => {
+        loadData();
     };
 
     if (view === "add") {
@@ -400,7 +416,7 @@ function Orders({ view, products }) {
                                         <div className="text-muted small">{order.shipping}</div>
                                     </td>
                                     <td>{new Date(order.createdAt).toLocaleString()}</td>
-                                    <td className="fw-bold text-dark">{order.totalPrice.toFixed(2)} CZK</td>
+                                    <td className="fw-bold text-dark">{order.totalPrice.toLocaleString('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} CZK</td>
                                     <td>
                                         <span className={`badge ${getStatusBadgeClass(order.status)}`}>
                                             {order.status}
@@ -478,7 +494,7 @@ function Orders({ view, products }) {
                                 <button className="btn btn-secondary" onClick={handleChangeStatus}>
                                     Change Status
                                 </button>
-                                <button className="btn btn-success">Create Invoice</button>
+                                <button className="btn btn-success" onClick={handleOpenInvoiceForm}>Create Invoice</button>
                                 <button className="btn btn-outline-dark" onClick={handleCloseModal}>
                                     Close
                                 </button>
@@ -487,6 +503,12 @@ function Orders({ view, products }) {
                     </div>
                 </div>
             )}
+            <InvoiceForm 
+                show={showInvoiceForm} 
+                selectedOrder={selectedOrder}
+                onClose={handleCloseInvoiceForm}
+                onSuccess={handleInvoiceSuccess}
+            />
         </div>
     );
 }

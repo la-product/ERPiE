@@ -10,6 +10,7 @@ public class InvoiceItemDTO
     public decimal UnitPrice { get; set; }
     public decimal VatRate { get; set; }
     public decimal TotalPrice { get; set; }
+  
 }
 
 public class CreateInvoiceItemDTO

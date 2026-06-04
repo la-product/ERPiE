@@ -6,6 +6,7 @@ import {
     deleteInvoice,
 } from "../services/invoiceService";
 import { getCustomers } from "../services/customerService";
+import {formatPrice } from '../utils/formatters'
 
 function Invoices({ view }) {
     const [invoices, setInvoices] = useState([]);
@@ -206,8 +207,8 @@ function Invoices({ view }) {
                                                 <td>{item.product?.brand} {item.product?.size} {item.product?.pattern}</td>
                                                 <td>{item.description}</td>
                                                 <td>{item.quantity}</td>
-                                                <td>{item.unitPrice.toFixed(2)}</td>
-                                                <td>{item.totalPrice.toFixed(2)}</td>
+                                                <td>{formatPrice(item.unitPrice)}</td>
+                                                <td>{formatPrice(item.totalPrice)}</td>
                                             </tr>
                                               
                                         ))}
@@ -218,22 +219,22 @@ function Invoices({ view }) {
                                     <div>
                                         Ex VAT:{" "}
                                         <strong>
-                                            {selectedInvoice.totalAmountExVat.toFixed(2)}{" "}
-                                            {selectedInvoice.currencyCode}
+                                            {formatPrice(selectedInvoice.totalAmountExVat)}{" "}
+                                           
                                         </strong>
                                     </div>
                                     <div>
                                         VAT:{" "}
                                         <strong>
-                                            {selectedInvoice.vatAmount.toFixed(2)}{" "}
-                                            {selectedInvoice.currencyCode}
+                                            {formatPrice(selectedInvoice.vatAmount)}{" "}
+                                            
                                         </strong>
                                     </div>
                                     <div className="fs-5">
                                         Total:{" "}
                                         <strong>
-                                            {selectedInvoice.totalAmountIncVat.toFixed(2)}{" "}
-                                            {selectedInvoice.currencyCode}
+                                            {formatPrice(selectedInvoice.totalAmountIncVat)}{" "}
+                                        
                                         </strong>
                                     </div>
                                 </div>

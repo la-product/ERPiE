@@ -5,6 +5,7 @@ import {
 import { getCustomers } from "../services/customerService";
 import { getProducts } from "../services/productService";
 import { getProductDisplayText } from "../mappers/productMapper";
+import { formatPrice } from '../utils/formatters'
 
 const addDays = (date, days) => {
     const nextDate = new Date(date);
@@ -441,7 +442,7 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
                                                                 disabled={loading}
                                                             />
                                                         </td>
-                                                        <td className="text-end fw-bold">{item.totalPrice.toFixed(2)}</td>
+                                                        <td className="text-end fw-bold">{formatPrice(item.totalPrice)}</td>
                                                         <td className="text-end">
                                                             <button
                                                                 className="btn btn-sm btn-outline-danger"
@@ -466,16 +467,16 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
                                     <div className="card-body">
                                         <div className="d-flex justify-content-between mb-2">
                                             <span className="text-muted">Subtotal (Ex VAT):</span>
-                                            <span className="fw-bold">{form.totalAmountExVat.toFixed(2)} {form.currencyCode}</span>
+                                            <span className="fw-bold">{formatPrice(form.totalAmountExVat)}</span>
                                         </div>
                                         <div className="d-flex justify-content-between mb-2">
                                             <span className="text-muted">VAT:</span>
-                                            <span className="fw-bold">{form.vatAmount.toFixed(2)} {form.currencyCode}</span>
+                                            <span className="fw-bold">{formatPrice(form.vatAmount)} </span>
                                         </div>
                                         <hr />
                                         <div className="d-flex justify-content-between align-items-center">
                                             <span className="h6 mb-0 fw-bold">Total Amount:</span>
-                                            <span className="h5 mb-0 fw-bold text-primary">{form.totalAmountIncVat.toFixed(2)} {form.currencyCode}</span>
+                                            <span className="h5 mb-0 fw-bold text-primary">{formatPrice(form.totalAmountIncVat)} </span>
                                         </div>
                                     </div>
                                 </div>

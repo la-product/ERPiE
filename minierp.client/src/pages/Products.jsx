@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getProducts, addProduct, updateProduct, deleteProduct } from '../services/productService';
 import { mapProductDtoToForm, getProductDisplayText } from '../mappers/productMapper';
+import { formatPrice } from '../utils/formatters';
 
 function Products({ view, products, setProducts, loading, setLoading, setActivePage }) {
     const [form, setForm] = useState({ size: '', brand: '', pattern: '', si: '', li: '', netPrice: '', stock: '' });
@@ -237,7 +238,7 @@ function Products({ view, products, setProducts, loading, setLoading, setActiveP
                                             {product.si}{product.li}
                                         </span>
                                     </td>
-                                    <td className="fw-bold text-dark">{product.netPrice} CZK</td>
+                                    <td className="fw-bold text-dark">{formatPrice(product.netPrice)}</td>
                                     <td>
                                         <span className={`badge ${product.stock > 10 ? 'bg-success-light text-success' : 'bg-warning-light text-warning'}`}>
                                             {product.stock} pcs

@@ -3,6 +3,7 @@ import { getCustomers } from "../services/customerService";
 import { getOrders, createOrder, updateOrderStatus, deleteOrder, getOrderById } from "../services/orderService";
 import { getProductDisplayText } from "../mappers/productMapper";
 import InvoiceForm from "./InvoiceForm";
+import { formatPrice } from "../utils/formatters";
 
 function Orders({ view, products, setActivePage }) {
     const [customers, setCustomers] = useState([]);
@@ -476,13 +477,13 @@ function Orders({ view, products, setActivePage }) {
                                                 <td>{item.product?.size || 'Unknown'} {item.product?.brand || 'Unknown'} </td>
                                                 <td>{item.product?.pattern || 'Unknown'}</td>
                                                 <td>{item.quantity}</td>
-                                                <td>{(item.unitPrice * item.quantity).toFixed(2)} CZK</td>
+                                                <td>{formatPrice(item.unitPrice * item.quantity)} </td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
                                 <div className="text-end mt-3">
-                                    <strong>Total: {selectedOrder.totalPrice.toFixed(2)} CZK</strong>
+                                    <strong>Total: {formatPrice(selectedOrder.totalPrice)}</strong>
                                 </div>
                                 <div className="mt-3">
                                     <span className={`badge ${getStatusBadgeClass(selectedOrder.status)}`}>

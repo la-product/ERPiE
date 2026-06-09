@@ -13,7 +13,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 
-function Customers({ view, setActivePage }) {
+function Customers({ view, setActivePage, user }) {
     const [customers, setCustomers] = useState([]);
     const [form, setForm] = useState({
         name: "",
@@ -305,7 +305,7 @@ function Customers({ view, setActivePage }) {
                                 <th>Name</th>
                                 <th>Contact Information</th>
                                 <th>Location</th>
-                                <th className="text-end">Actions</th>
+                                {user?.role === 'Admin' && <th className="text-end">Actions</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -319,6 +319,7 @@ function Customers({ view, setActivePage }) {
                                         </div>
                                     </td>
                                     <td>{customer.city}</td>
+                                        {user?.role === 'Admin' && (
                                     <td className="text-end">
                                         <button
                                             className="btn btn-sm btn-outline-primary me-2"
@@ -333,6 +334,7 @@ function Customers({ view, setActivePage }) {
                                             <i className="bi bi-trash"></i>
                                         </button>
                                     </td>
+                                        )}
                                 </tr>
                             ))}
                         </tbody>

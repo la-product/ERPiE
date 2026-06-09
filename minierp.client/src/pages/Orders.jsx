@@ -5,7 +5,7 @@ import { getProductDisplayText } from "../mappers/productMapper";
 import InvoiceForm from "./InvoiceForm";
 import { formatPrice } from "../utils/formatters";
 
-function Orders({ view, products, setActivePage }) {
+function Orders({ view, products, setActivePage, user }) {
     const [customers, setCustomers] = useState([]);
     const [orders, setOrders] = useState([]);
     const [selectedOrder, setSelectedOrder] = useState(null);
@@ -430,12 +430,14 @@ function Orders({ view, products, setActivePage }) {
                                         >
                                             <i className="bi bi-eye"></i>
                                         </button>
-                                        <button
-                                            className="btn btn-sm btn-outline-danger"
-                                            onClick={() => handleDeleteOrder(order.id)}
-                                        >
-                                            <i className="bi bi-trash"></i>
-                                        </button>
+                                        {user?.role === 'Admin' && (
+                                            <button
+                                                className="btn btn-sm btn-outline-danger"
+                                                onClick={() => handleDeleteOrder(order.id)}
+                                            >
+                                                <i className="bi bi-trash"></i>
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

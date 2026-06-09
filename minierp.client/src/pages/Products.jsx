@@ -3,7 +3,7 @@ import { getProducts, addProduct, updateProduct, deleteProduct } from '../servic
 import { mapProductDtoToForm, getProductDisplayText } from '../mappers/productMapper';
 import { formatPrice } from '../utils/formatters';
 
-function Products({ view, products, setProducts, loading, setLoading, setActivePage }) {
+function Products({ view, products, setProducts, loading, setLoading, setActivePage, user }) {
     const [form, setForm] = useState({ size: '', brand: '', pattern: '', si: '', li: '', netPrice: '', stock: '' });
     const [showModal, setShowModal] = useState(false);
     const [editForm, setEditForm] = useState({});
@@ -186,8 +186,10 @@ function Products({ view, products, setProducts, loading, setLoading, setActiveP
                                     </div>
                                     <div className="col-md-6">
                                         <label className="form-label">NetPrice</label>
-                                        <input className="form-control" value={editForm.netPrice || ''}
-                                            onChange={e => setEditForm({ ...editForm, netPrice: e.target.value })} />
+                                        <input className="form-control"
+                                            value={editForm.netPrice || ''}
+                                            onChange={e => setEditForm({ ...editForm, netPrice: e.target.value })}
+                                                                                 />
                                     </div>
                                     <div className="col-md-6">
                                         <label className="form-label">Stock</label>
@@ -223,7 +225,7 @@ function Products({ view, products, setProducts, loading, setLoading, setActiveP
                                 <th>SI/LI</th>
                                 <th>Price</th>
                                 <th>Stock</th>
-                                <th className="text-end">Actions</th>
+                                {user?.role === 'Admin' && <th className="text-end">Actions</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -244,16 +246,18 @@ function Products({ view, products, setProducts, loading, setLoading, setActiveP
                                             {product.stock} pcs
                                         </span>
                                     </td>
-                                    <td className="text-end">
-                                        <button className="btn btn-sm btn-outline-primary me-2"
-                                            onClick={() => handleEdit(product)}>
-                                            <i className="bi bi-pencil"></i>
-                                        </button>
-                                        <button className="btn btn-sm btn-outline-danger"
-                                            onClick={() => handleDelete(product.id)}>
-                                            <i className="bi bi-trash"></i>
-                                        </button>
-                                    </td>
+                                    {user?.role === 'Admin' && (
+                                        <td className="text-end">
+                                            <button className="btn btn-sm btn-outline-primary me-2"
+                                                onClick={() => handleEdit(product)}>
+                                                <i className="bi bi-pencil"></i>
+                                            </button>
+                                            <button className="btn btn-sm btn-outline-danger"
+                                                onClick={() => handleDelete(product.id)}>
+                                                <i className="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    )}
                                 </tr>
                             ))}
                         </tbody>

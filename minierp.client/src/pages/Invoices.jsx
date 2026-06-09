@@ -8,7 +8,7 @@ import {
 import { getCustomers } from "../services/customerService";
 import {formatPrice } from '../utils/formatters'
 
-function Invoices({ view }) {
+function Invoices({ view, user }) {
     const [invoices, setInvoices] = useState([]);
     const [customers, setCustomers] = useState([]);
     const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -154,12 +154,14 @@ function Invoices({ view }) {
                                         >
                                             <i className="bi bi-eye"></i>
                                         </button>
+                                        {user?.role === 'Admin'&& (
                                         <button
                                             className="btn btn-sm btn-outline-danger"
                                             onClick={() => handleDeleteInvoice(invoice.id)}
                                         >
                                             <i className="bi bi-trash"></i>
-                                        </button>
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

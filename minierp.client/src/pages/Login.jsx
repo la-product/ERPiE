@@ -87,7 +87,7 @@ function Login({ onLogin }) {
                         ) : 'Přihlásit se'}
                     </button>
                     <div className="text-muted fst-italic mt-3 text-center">
-                    <p>Přihlašovací jméno je admin. Heslo je taktéž admin s password psáno dohromady. Aplikace slouží pouze pro prezentaci.</p>
+                    <p>Přihlašovací jméno je demo. Heslo je taktéž demo s password psáno dohromady. Aplikace slouží pouze pro prezentaci.</p>
                     </div>
                 </form>
             </div>

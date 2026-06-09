@@ -1,6 +1,6 @@
 # ERPiE
 
-Webová aplikace pro správu zákazníků, produktů, objednávek, faktur a uživatelů. Projekt slouží jako demonstrační ERP systém.
+Webová aplikace pro správu zákazníků, produktů, objednávek, faktur a uživatelů. Projekt slouží jako demonstrační mini ERP systém.
 
 ## Technologie
 

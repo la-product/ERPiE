@@ -122,4 +122,4 @@ Frontend běží na `http://localhost:5173`.
 
 ## Stav projektu
 
-Projekt je aktivně vyvíjen jako ukázka ERP systému. Aktuálně je implementována základní správa entit a autentizace.
+Projekt je aktivně vyvíjen jako ukázka ERP systému. 

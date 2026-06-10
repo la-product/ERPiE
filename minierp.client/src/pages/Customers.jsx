@@ -319,7 +319,7 @@ function Customers({ view, setActivePage, user }) {
                                         </div>
                                     </td>
                                     <td>{customer.city}</td>
-                                        {user?.role === 'Admin' && (
+                                        {user?.role !== 'Admin' && (
                                     <td className="text-end">
                                         <button
                                             className="btn btn-sm btn-outline-primary me-2"

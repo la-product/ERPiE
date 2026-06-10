@@ -1,6 +1,6 @@
 ﻿import { useState } from 'react';
 
-function Users({ view }) {
+function Users({ view, setActivePage }) {
     const [users, setUsers] = useState([
         { id: 1, username: 'admin', role: 'Admin' },
         { id: 2, username: 'demo', role: 'Demo' }
@@ -51,7 +51,7 @@ function Users({ view }) {
         <div>
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h4 className="fw-bold mb-0">Nový uživatel</h4>
-                <button className="btn btn-outline-secondary" onClick={() => (window.location.hash = "#/users")}>
+                <button className="btn btn-outline-secondary" onClick={() => setActivePage('User list')}>
                     <i className="bi bi-arrow-left me-2"></i>Zpět na seznam
                 </button>
             </div>

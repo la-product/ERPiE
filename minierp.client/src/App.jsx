@@ -53,8 +53,8 @@ function App() {
             case 'Add order': return <Orders view="add" products={products} setProducts={setProducts} setActivePage={setActivePage} />;
             case 'Invoice list': return <Invoices view="list" setUser={setUser} />;
             case 'Add invoice': return <Invoices view="add" />;
-            case 'User list': return user?.role === 'Admin' ? <Users view="list" /> : null;
-            case 'Add user': return user?.role === 'Admin' ? <Users view="add" /> : null;
+            case 'User list': return user?.role === 'Admin' ? <Users view="list" setActivePage={setActivePage} /> : null;
+            case 'Add user': return user?.role === 'Admin' ? <Users view="add" setActivePage={setActivePage} /> : null;
             default: return null;
         }
     };

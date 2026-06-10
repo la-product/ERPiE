@@ -2,6 +2,7 @@ using MiniERP.Server.Models;
 using MiniERP.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using MiniERP.Server.Services;
 
 namespace MiniERP.Server;
 
@@ -22,6 +23,10 @@ public class Program {
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
 
+        builder.Services.AddScoped<ProductService>();
+        builder.Services.AddScoped<OrderService>();
+        builder.Services.AddScoped<InvoiceService>();
+        builder.Services.AddScoped<CustomerService>();
         builder.Services.AddCors(options => {
             options.AddPolicy("AllowReact", policy => {
                 policy.WithOrigins("https://localhost:5173", "https://myminierp.runasp.net/").AllowAnyHeader()

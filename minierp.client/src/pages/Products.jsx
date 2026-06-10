@@ -225,7 +225,7 @@ function Products({ view, products, setProducts, loading, setLoading, setActiveP
                                 <th>SI/LI</th>
                                 <th>Price</th>
                                 <th>Stock</th>
-                                {user?.role === 'Admin' && <th className="text-end">Actions</th>}
+                                {user?.role === 'admin' && <th className="text-end">Actions</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -246,7 +246,7 @@ function Products({ view, products, setProducts, loading, setLoading, setActiveP
                                             {product.stock} pcs
                                         </span>
                                     </td>
-                                    {user?.role !== 'Admin' && (
+                                    {user?.role === 'admin' && (
                                         <td className="text-end">
                                             <button className="btn btn-sm btn-outline-primary me-2"
                                                 onClick={() => handleEdit(product)}>

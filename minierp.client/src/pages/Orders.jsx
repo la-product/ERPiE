@@ -430,7 +430,7 @@ function Orders({ view, products, setActivePage, user }) {
                                         >
                                             <i className="bi bi-eye"></i>
                                         </button>
-                                        {user?.role !== 'Admin' && (
+                                        {user?.role === 'admin' && (
                                             <button
                                                 className="btn btn-sm btn-outline-danger"
                                                 onClick={() => handleDeleteOrder(order.id)}

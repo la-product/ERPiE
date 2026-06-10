@@ -154,7 +154,7 @@ function Invoices({ view, user }) {
                                         >
                                             <i className="bi bi-eye"></i>
                                         </button>
-                                        {user?.role !== 'Admin'&& (
+                                        {user?.role === 'admin'&& (
                                         <button
                                             className="btn btn-sm btn-outline-danger"
                                             onClick={() => handleDeleteInvoice(invoice.id)}

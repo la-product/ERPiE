@@ -305,7 +305,7 @@ function Customers({ view, setActivePage, user }) {
                                 <th>Name</th>
                                 <th>Contact Information</th>
                                 <th>Location</th>
-                                {user?.role === 'Admin' && <th className="text-end">Actions</th>}
+                                {user?.role === 'admin' && <th className="text-end">Actions</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -319,7 +319,7 @@ function Customers({ view, setActivePage, user }) {
                                         </div>
                                     </td>
                                     <td>{customer.city}</td>
-                                        {user?.role !== 'Admin' && (
+                                        {user?.role === 'admin' && (
                                     <td className="text-end">
                                         <button
                                             className="btn btn-sm btn-outline-primary me-2"

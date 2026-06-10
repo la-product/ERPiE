@@ -2,8 +2,8 @@
 
 function Users({ view, setActivePage }) {
     const [users, setUsers] = useState([
-        { id: 1, username: 'admin', role: 'Admin' },
-        { id: 2, username: 'demo', role: 'Demo' }
+        { id: 1, username: 'admin', role: 'admin' },
+        { id: 2, username: 'demo', role: 'demo' }
     ]);
 
     const renderList = () => (
@@ -26,7 +26,7 @@ function Users({ view, setActivePage }) {
                                 <tr key={u.id}>
                                     <td className="px-4 py-3 align-middle">{u.username}</td>
                                     <td className="px-4 py-3 align-middle">
-                                        <span className={`badge ${u.role === 'Admin' ? 'bg-primary' : 'bg-secondary'}`}>
+                                        <span className={`badge ${u.role === 'admin' ? 'bg-primary' : 'bg-secondary'}`}>
                                             {u.role}
                                         </span>
                                     </td>

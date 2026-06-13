@@ -31,11 +31,11 @@ Webová aplikace pro správu zákazníků, produktů, objednávek, faktur a uži
 - [x] Přidání produktu
 - [x] Úprava produktu
 
-### Objednávky
-- [x] Seznam objednávek
-- [x] Vytvoření objednávky (výběr zákazníka, produktů, dopravy a platby)
-- [x] Automatické odečtení skladu po vytvoření objednávky
-- [x] Změna stavu objednávky (New → Processing → Shipped → Completed)
+### Dodací Listy
+- [x] Seznam 
+- [x] Vytvoření DL (výběr zákazníka, produktů, dopravy a platby)
+- [x] Automatické odečtení skladu po vytvoření DL
+- [x] Změna stavu objednávky 
 
 ### Faktury
 - [x] Seznam faktur
@@ -122,4 +122,4 @@ Frontend běží na `http://localhost:5173`.
 
 ## Stav projektu
 
-Projekt je aktivně vyvíjen jako ukázka ERP systému. 
+Projekt je aktivně vyvíjen jako ukázka logiky v ERP systému. 

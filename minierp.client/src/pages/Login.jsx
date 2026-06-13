@@ -28,7 +28,7 @@ function Login({ onLogin }) {
                 setError(errorData.message || 'Přihlášení se nezdařilo');
             }
         } catch (err) {
-            setError('Nepodařilo se spojit se serverem');
+            setError('Nepodařilo se spojit se serverem' + err.message);
         } finally {
             setLoading(false);
         }

@@ -31,7 +31,7 @@ export const mapFormToCreateInvoiceDto = (formData, items) => {
         totalAmountExVat: parseFloat(formData.totalAmountExVat) || 0,
         vatAmount: parseFloat(formData.vatAmount) || 0,
         totalAmountIncVat: parseFloat(formData.totalAmountIncVat) || 0,
-        currencyCode: formData.currencyCode || "CZK",
+        currencyCode: formData.currencyCode || "Kč",
         status: formData.status || "",
         items: items.map((item) => ({
             productId: item.productId,

@@ -16,8 +16,8 @@ function Orders({ view, products, setActivePage, user }) {
         street: '',
         city: '',
         zip: '',
-        shipping: 'courier',
-        payment: 'card',
+        shipping: 'Kurýr',
+        payment: 'Platební karta',
         note: ''
     });
     const [items, setItems] = useState([]);
@@ -27,15 +27,13 @@ function Orders({ view, products, setActivePage, user }) {
     });
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [modalView, setModalView] = useState('details');
 
     const getStatusBadgeClass = (status) => {
-        switch (status) {
-            case 'New': return 'badge-primary-light';
-            case 'Processing': return 'badge-warning-light';
-            case 'Shipped': return 'badge-success-light';
-            case 'Completed': return 'badge-success';
-            default: return 'bg-light text-dark';
+        switch (status?.toLowerCase()) {
+            case 'new': return 'badge-danger';
+            case 'processing': return 'badge-warning-light';
+            case 'completed': return 'badge-success';
+            default: return 'bg-secondary';
         }
     };
 
@@ -92,8 +90,8 @@ function Orders({ view, products, setActivePage, user }) {
     };
 
     const handleCreateOrder = async () => {
-        if (!form.customerId) { alert("Select customer"); return; }
-        if (items.length === 0) { alert("Add products"); return; }
+        if (!form.customerId) { alert("Vyberte zákazníka"); return; }
+        if (items.length === 0) { alert("Přidejte položky"); return; }
 
         try {
             const orderPayload = {
@@ -115,7 +113,7 @@ function Orders({ view, products, setActivePage, user }) {
             await loadData();
 
             setItems([]);
-            setForm({ customerId: '', street: '', city: '', zip: '', shipping: 'courier', payment: 'card', note: '' });
+            setForm({ customerId: '', street: '', city: '', zip: '', shipping: 'Kurýr', payment: 'Platební karta', note: '' });
             setCurrentItem({ brand: '', quantity: 1 });
             setError(null);
         } catch (err) {
@@ -127,7 +125,6 @@ function Orders({ view, products, setActivePage, user }) {
         try {
             const detail = await getOrderById(order.id);
             setSelectedOrder(detail);
-            setModalView('details');
             setShowModal(true);
         } catch (err) {
             setError(err.message);
@@ -140,15 +137,17 @@ function Orders({ view, products, setActivePage, user }) {
     };
 
     const handleChangeStatus = async () => {
-        const statuses = ["new", "Processing", "Shipped", "Completed"];
-        const currentIndex = statuses.indexOf(selectedOrder.status);
-        if (currentIndex === -1 || currentIndex === statuses.length - 1) return;
+        const statuses = ["New", "Processing", "Completed"];
+        const currentIndex = statuses.findIndex(
+            s => s.toLowerCase() === selectedOrder.status.toLowerCase()
+        );
+        const nextIndex = (currentIndex + 1) % statuses.length;
+        const nextStatus = statuses[nextIndex];
 
         try {
-            const updatedStatus = statuses[currentIndex + 1];
-            await updateOrderStatus(selectedOrder.id, updatedStatus);
+            await updateOrderStatus(selectedOrder.id, nextStatus);
             await loadData();
-            setSelectedOrder({ ...selectedOrder, status: updatedStatus });
+            setSelectedOrder({ ...selectedOrder, status: nextStatus });
             setError(null);
         } catch (err) {
             setError(err.message);
@@ -183,22 +182,22 @@ function Orders({ view, products, setActivePage, user }) {
         return (
             <div>
                 <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h4 className="fw-bold mb-0">New Order</h4>
-                    <button className="btn btn-outline-secondary" onClick={() => setActivePage('Order list')}>
-                        <i className="bi bi-arrow-left me-2"></i>Back to List
+                    <h4 className="fw-bold mb-0">Nový Dodací List</h4>
+                    <button className="btn btn-outline-secondary" onClick={() => setActivePage('Seznam DL')}>
+                        <i className="bi bi-arrow-left me-2"></i>Zpět na seznam
                     </button>
                 </div>
                 {error && <div className="alert alert-danger">{error}</div>}
                 <div className="card border-0 shadow-sm" style={{ maxWidth: 900 }}>
                     <div className="card-body p-4">
-                        {/* Customer */}
+                        {/* Zákazník */}
                         <div className="mb-4">
-                            <label className="form-label small fw-bold text-uppercase text-muted">Customer Selection</label>
+                            <label className="form-label small fw-bold text-uppercase text-muted">Výběr zákazníka</label>
                             <div className="input-group">
                                 <span className="input-group-text bg-white"><i className="bi bi-search text-muted"></i></span>
                                 <input
                                     className="form-control"
-                                    placeholder="— Type to search customer —"
+                                    placeholder="— Vyhledat zákazníka —"
                                     list="customer-list"
                                     onChange={handleCustomerInput}
                                 />
@@ -210,73 +209,73 @@ function Orders({ view, products, setActivePage, user }) {
                             </div>
                         </div>
 
-                        {/* Shipping */}
+                        {/* Doprava */}
                         <div className="border-top pt-4 mt-4">
-                            <h6 className="fw-bold mb-3">Shipping & Payment</h6>
+                            <h6 className="fw-bold mb-3">Doprava & Platba</h6>
                             <div className="row g-3">
                                 <div className="col-12">
-                                    <label className="form-label small fw-bold text-uppercase text-muted">Delivery Address</label>
+                                    <label className="form-label small fw-bold text-uppercase text-muted">Adresa doručení</label>
                                     <input
                                         className="form-control"
-                                        placeholder="Street and house number"
+                                        placeholder="Ulice a číslo popisné"
                                         value={form.street}
                                         onChange={e => setForm({ ...form, street: e.target.value })}
                                     />
                                 </div>
                                 <div className="col-md-8">
-                                    <label className="form-label small fw-bold text-uppercase text-muted">City</label>
+                                    <label className="form-label small fw-bold text-uppercase text-muted">Město</label>
                                     <input
                                         className="form-control"
-                                        placeholder="City"
+                                        placeholder="Město"
                                         value={form.city}
                                         onChange={e => setForm({ ...form, city: e.target.value })}
                                     />
                                 </div>
                                 <div className="col-md-4">
-                                    <label className="form-label small fw-bold text-uppercase text-muted">ZIP</label>
+                                    <label className="form-label small fw-bold text-uppercase text-muted">PSČ</label>
                                     <input
                                         className="form-control"
-                                        placeholder="ZIP"
+                                        placeholder="PSČ"
                                         value={form.zip}
                                         onChange={e => setForm({ ...form, zip: e.target.value })}
                                     />
                                 </div>
                                 <div className="col-md-6">
-                                    <label className="form-label small fw-bold text-uppercase text-muted">Shipping Method</label>
+                                    <label className="form-label small fw-bold text-uppercase text-muted">Způsob doručení</label>
                                     <select
                                         className="form-select"
                                         value={form.shipping}
                                         onChange={e => setForm({ ...form, shipping: e.target.value })}
                                     >
-                                        <option value="courier">Courier Delivery</option>
+                                        <option value="Kurýr">Kurýr</option>
                                         <option value="packeta">Zásilkovna</option>
-                                        <option value="personal">Personal pickup</option>
+                                        <option value="personal">Osobní odběr</option>
                                     </select>
                                 </div>
                                 <div className="col-md-6">
-                                    <label className="form-label small fw-bold text-uppercase text-muted">Payment Method</label>
+                                    <label className="form-label small fw-bold text-uppercase text-muted">Typ platby</label>
                                     <select
                                         className="form-select"
                                         value={form.payment}
                                         onChange={e => setForm({ ...form, payment: e.target.value })}
                                     >
-                                        <option value="card">Credit Card</option>
-                                        <option value="transfer">Bank transfer</option>
-                                        <option value="cash">Cash on delivery</option>
+                                        <option value="card">Platební karta</option>
+                                        <option value="transfer">Bankovní převod</option>
+                                        <option value="cash">Dobírka</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Items */}
+                        {/* Položky */}
                         <div className="border-top pt-4 mt-4">
-                            <h6 className="fw-bold mb-3">Order Items</h6>
+                            <h6 className="fw-bold mb-3">Položky</h6>
                             <div className="row g-2 mb-3 align-items-end">
                                 <div className="col-md-8">
-                                    <label className="form-label small">Product</label>
+                                    <label className="form-label small">Zboží</label>
                                     <input
                                         className="form-control"
-                                        placeholder="— Search product —"
+                                        placeholder="— Vyhledat zboží —"
                                         list="product-list"
                                         value={currentItem.brand}
                                         onChange={e => setCurrentItem({ ...currentItem, brand: e.target.value })}
@@ -288,12 +287,12 @@ function Orders({ view, products, setActivePage, user }) {
                                     </datalist>
                                 </div>
                                 <div className="col-md-2">
-                                    <label className="form-label small">Qty</label>
+                                    <label className="form-label small">Množství</label>
                                     <input
                                         className="form-control"
                                         type="number"
                                         min="1"
-                                        placeholder="Qty"
+                                        placeholder="Množství"
                                         value={currentItem.quantity}
                                         onChange={e => setCurrentItem({ ...currentItem, quantity: parseInt(e.target.value) })}
                                     />
@@ -303,21 +302,20 @@ function Orders({ view, products, setActivePage, user }) {
                                         className="btn btn-outline-primary w-100"
                                         onClick={handleAddProduct}
                                     >
-                                        <i className="bi bi-plus-lg me-1"></i>Add
+                                        <i className="bi bi-plus-lg me-1"></i>Přidat
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Items list */}
                             {items.length > 0 && (
                                 <div className="table-responsive">
                                     <table className="table table-hover align-middle">
                                         <thead className="table-light">
                                             <tr>
-                                                <th>Product</th>
-                                                <th className="text-center">Qty</th>
-                                                <th className="text-end">Price</th>
-                                                <th className="text-end">Action</th>
+                                                <th>Zboží</th>
+                                                <th className="text-center">Množství</th>
+                                                <th className="text-end">Cena</th>
+                                                <th className="text-end">Akce</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -325,7 +323,7 @@ function Orders({ view, products, setActivePage, user }) {
                                                 <tr key={index}>
                                                     <td className="fw-medium">{item.brand}</td>
                                                     <td className="text-center">{item.quantity}</td>
-                                                    <td className="text-end fw-bold">{item.totalPrice.toFixed(2)} CZK</td>
+                                                    <td className="text-end fw-bold">{item.totalPrice.toFixed(2)} Kč</td>
                                                     <td className="text-end">
                                                         <button
                                                             className="btn btn-sm btn-outline-danger"
@@ -339,9 +337,9 @@ function Orders({ view, products, setActivePage, user }) {
                                         </tbody>
                                         <tfoot className="table-light">
                                             <tr>
-                                                <td colSpan="2" className="text-end fw-bold text-uppercase small text-muted">Total Order Value:</td>
+                                                <td colSpan="2" className="text-end fw-bold text-uppercase small text-muted">Celkem bez DPH:</td>
                                                 <td className="text-end fw-bold text-primary h5 mb-0">
-                                                    {items.reduce((sum, item) => sum + item.totalPrice, 0).toFixed(2)} CZK
+                                                    {items.reduce((sum, item) => sum + item.totalPrice, 0).toFixed(2)} Kč
                                                 </td>
                                                 <td></td>
                                             </tr>
@@ -351,13 +349,13 @@ function Orders({ view, products, setActivePage, user }) {
                             )}
                         </div>
 
-                        {/* Note */}
+                        {/* Poznámka */}
                         <div className="border-top pt-4 mt-4">
-                            <label className="form-label small fw-bold text-uppercase text-muted">Internal Note</label>
+                            <label className="form-label small fw-bold text-uppercase text-muted">Poznámka</label>
                             <textarea
                                 className="form-control"
                                 rows={2}
-                                placeholder="Add any special instructions or notes..."
+                                placeholder="Interní poznámka nebo speciální instrukce..."
                                 value={form.note}
                                 onChange={e => setForm({ ...form, note: e.target.value })}
                             />
@@ -368,7 +366,7 @@ function Orders({ view, products, setActivePage, user }) {
                                 className="btn btn-primary btn-lg w-100 fw-bold"
                                 onClick={handleCreateOrder}
                             >
-                                <i className="bi bi-check2-square me-2"></i>Complete Order
+                                <i className="bi bi-check2-square me-2"></i>Vytvořit Dodací List
                             </button>
                         </div>
                     </div>
@@ -381,7 +379,7 @@ function Orders({ view, products, setActivePage, user }) {
         return (
             <div className="d-flex justify-content-center align-items-center h-100">
                 <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
+                    <span className="visually-hidden">Načítání...</span>
                 </div>
             </div>
         );
@@ -390,9 +388,9 @@ function Orders({ view, products, setActivePage, user }) {
     return (
         <div>
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h4 className="fw-bold mb-0">List of Orders</h4>
-                <button className="btn btn-primary" onClick={() => setActivePage('Add order')}>
-                    <i className="bi bi-plus-lg me-2"></i>New Order
+                <h4 className="fw-bold mb-0">Seznam Dodacích Listů</h4>
+                <button className="btn btn-primary" onClick={() => setActivePage('Přidat DL')}>
+                    <i className="bi bi-plus-lg me-2"></i>Nový Dodací List
                 </button>
             </div>
             <div className="card border-0 shadow-sm overflow-hidden">
@@ -400,12 +398,12 @@ function Orders({ view, products, setActivePage, user }) {
                     <table className="table table-hover mb-0">
                         <thead>
                             <tr>
-                                <th>Order ID</th>
-                                <th>Customer</th>
-                                <th>Created At</th>
-                                <th>Total Price</th>
-                                <th>Status</th>
-                                <th className="text-end">Actions</th>
+                                <th>Číslo DL</th>
+                                <th>Zákazník</th>
+                                <th>Vytvořeno</th>
+                                <th>Celkem bez DPH</th>
+                                <th>Stav</th>
+                                <th className="text-end">Akce</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -413,11 +411,11 @@ function Orders({ view, products, setActivePage, user }) {
                                 <tr key={order.id}>
                                     <td className="fw-bold text-dark">#{order.id}</td>
                                     <td>
-                                        <div className="fw-bold text-dark">{order.customer?.name || 'Unknown'}</div>
+                                        <div className="fw-bold text-dark">{order.customer?.name || 'Neznámý'}</div>
                                         <div className="text-muted small">{order.shipping}</div>
                                     </td>
-                                    <td>{new Date(order.createdAt).toLocaleString()}</td>
-                                    <td className="fw-bold text-dark">{order.totalPrice.toLocaleString('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} CZK</td>
+                                    <td>{new Date(order.createdAt).toLocaleString('cs-CZ')}</td>
+                                    <td className="fw-bold text-dark">{order.totalPrice.toLocaleString('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kč</td>
                                     <td>
                                         <span className={`badge ${getStatusBadgeClass(order.status)}`}>
                                             {order.status}
@@ -445,7 +443,7 @@ function Orders({ view, products, setActivePage, user }) {
                     </table>
                 </div>
             </div>
-            {/* Modal okno */}
+            { /* Modal okno*/}
             {showModal && selectedOrder && (
                 <div
                     className="modal show d-block"
@@ -455,37 +453,37 @@ function Orders({ view, products, setActivePage, user }) {
                     <div className="modal-dialog modal-lg">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h5 className="modal-title">Order #{selectedOrder.id}</h5>
+                                <h5 className="modal-title">Dodací List #{selectedOrder.id}</h5>
                                 <button className="btn-close" onClick={handleCloseModal} />
                             </div>
                             <div className="modal-body">
-                                <h6>Customer</h6>
+                                <h6>Zákazník</h6>
                                 <p className="mb-1">{selectedOrder.customer?.name}</p>
                                 <p className="text-muted">{selectedOrder.shipping}</p>
                                 <hr />
-                                <h6>Items</h6>
+                                <h6>Položky</h6>
                                 <table className="table table-sm">
                                     <thead>
                                         <tr>
-                                            <th>Product</th>
-                                            <th>Pattern</th>
-                                            <th>Qty</th>
-                                            <th>Price</th>
+                                            <th>Zboží</th>
+                                            <th>Vzor</th>
+                                            <th>Množství</th>
+                                            <th>Cena</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {selectedOrder.items.map((item, index) => (
                                             <tr key={index}>
-                                                <td>{item.product?.size || 'Unknown'} {item.product?.brand || 'Unknown'} </td>
-                                                <td>{item.product?.pattern || 'Unknown'}</td>
+                                                <td>{item.product?.size || 'Neznámý'} {item.product?.brand || 'Neznámý'}</td>
+                                                <td>{item.product?.pattern || 'Neznámý'}</td>
                                                 <td>{item.quantity}</td>
-                                                <td>{formatPrice(item.unitPrice * item.quantity)} </td>
+                                                <td>{formatPrice(item.unitPrice * item.quantity)}</td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
                                 <div className="text-end mt-3">
-                                    <strong>Total: {formatPrice(selectedOrder.totalPrice)}</strong>
+                                    <strong>Celkem: {formatPrice(selectedOrder.totalPrice)}</strong>
                                 </div>
                                 <div className="mt-3">
                                     <span className={`badge ${getStatusBadgeClass(selectedOrder.status)}`}>
@@ -495,19 +493,19 @@ function Orders({ view, products, setActivePage, user }) {
                             </div>
                             <div className="modal-footer">
                                 <button className="btn btn-secondary" onClick={handleChangeStatus}>
-                                    Change Status
+                                    Změnit stav
                                 </button>
-                                <button className="btn btn-success" onClick={handleOpenInvoiceForm}>Create Invoice</button>
+                                <button className="btn btn-success" onClick={handleOpenInvoiceForm}>Vytvořit fakturu</button>
                                 <button className="btn btn-outline-dark" onClick={handleCloseModal}>
-                                    Close
+                                    Zavřít
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
-            <InvoiceForm 
-                show={showInvoiceForm} 
+            <InvoiceForm
+                show={showInvoiceForm}
                 selectedOrder={selectedOrder}
                 onClose={handleCloseInvoiceForm}
                 onSuccess={handleInvoiceSuccess}

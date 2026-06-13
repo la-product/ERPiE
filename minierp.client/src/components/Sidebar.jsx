@@ -6,25 +6,25 @@ function Sidebar({ activePage, setActivePage, user }) {
 
   const menu = [
     {
-      label: "Customers",
+      label: "Adresář firem",
       icon: "bi bi-people",
-      items: ["Customer list", "Add customer"],
+      items: ["Seznam firem", "Přidat firmu"],
     },
     {
-      label: "Products",
+      label: "Produkty",
       icon: "bi bi-box",
-      items: ["Product list", "Add product"],
+      items: ["Seznam produktů", "Přidat produkt"],
     },
-    { label: "Orders", icon: "bi bi-cart", items: ["Order list", "Add order"] },
+    { label: "Dodací list", icon: "bi bi-cart", items: ["Seznam DL", "Přidat DL"] },
     {
-      label: "Invoices",
+      label: "Faktury",
       icon: "bi bi-receipt",
-      items: ["Invoice list", "Add invoice"],
+      items: ["Seznam FV", "Přidat FV"],
     },
-    ...(user?.role === 'Admin' ? [{
-      label: "Users",
+    ...(user?.role === 'admin' ? [{
+      label: "Uživatelé",
       icon: "bi bi-person-gear",
-      items: ["User list", "Add user"],
+      items: ["Seznam uživatelů", "Přidat uživatele"],
     }] : []),
   ];
 

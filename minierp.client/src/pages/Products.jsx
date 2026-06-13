@@ -117,12 +117,12 @@ function Products({
         return (
             <div>
                 <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h4 className="fw-bold mb-0">Add Product</h4>
+                    <h4 className="fw-bold mb-0">Přidat produkt</h4>
                     <button
                         className="btn btn-outline-secondary"
-                        onClick={() => setActivePage("Product list")}
+                        onClick={() => setActivePage("Seznam produktů")}
                     >
-                        <i className="bi bi-arrow-left me-2"></i>Back to List
+                        <i className="bi bi-arrow-left me-2"></i>Zpět na seznam
                     </button>
                 </div>
                 {error && <div className="alert alert-danger">{error}</div>}
@@ -131,7 +131,7 @@ function Products({
                         <div className="row g-3">
                             <div className="col-md-6">
                                 <label className="form-label small fw-bold text-uppercase text-muted">
-                                    Brand / Manufacturer
+                                   Značka
                                 </label>
                                 <div className="input-group">
                                     <span className="input-group-text bg-white">
@@ -149,7 +149,7 @@ function Products({
                             </div>
                             <div className="col-md-6">
                                 <label className="form-label small fw-bold text-uppercase text-muted">
-                                    Product Size
+                                    Rozměr
                                 </label>
                                 <input
                                     className="form-control"
@@ -160,7 +160,7 @@ function Products({
                             </div>
                             <div className="col-md-6">
                                 <label className="form-label small fw-bold text-uppercase text-muted">
-                                    Pattern
+                                   Dezén
                                 </label>
                                 <input
                                     className="form-control"
@@ -173,7 +173,7 @@ function Products({
                             </div>
                             <div className="col-md-3">
                                 <label className="form-label small fw-bold text-uppercase text-muted">
-                                    SI (Speed Index)
+                                    SI (Index rychlosti)
                                 </label>
                                 <input
                                     className="form-control"
@@ -184,7 +184,7 @@ function Products({
                             </div>
                             <div className="col-md-3">
                                 <label className="form-label small fw-bold text-uppercase text-muted">
-                                    LI (Load Index)
+                                    LI (Index zátěže)
                                 </label>
                                 <input
                                     className="form-control"
@@ -195,7 +195,7 @@ function Products({
                             </div>
                             <div className="col-md-6">
                                 <label className="form-label small fw-bold text-uppercase text-muted">
-                                    Net Price (
+                                    Cena bez DPH (
                                     {new Intl.NumberFormat("cs-CZ", {
                                         style: "currency",
                                         currency: "CZK",
@@ -220,7 +220,7 @@ function Products({
                             </div>
                             <div className="col-md-6">
                                 <label className="form-label small fw-bold text-uppercase text-muted">
-                                    Stock Quantity
+                                    Množství
                                 </label>
                                 <div className="input-group">
                                     <span className="input-group-text bg-white">
@@ -243,7 +243,7 @@ function Products({
                                 className="btn btn-primary btn-lg w-100 fw-bold"
                                 onClick={handleSubmit}
                             >
-                                <i className="bi bi-plus-circle me-2"></i>Create Product
+                                <i className="bi bi-plus-circle me-2"></i>Vytvoř produkt
                             </button>
                         </div>
                     </div>
@@ -273,7 +273,7 @@ function Products({
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h5 className="modal-title">Edit Product</h5>
+                                <h5 className="modal-title">Edituj produkt</h5>
                                 <button
                                     className="btn-close"
                                     onClick={() => setShowModal(false)}
@@ -282,7 +282,7 @@ function Products({
                             <div className="modal-body">
                                 <div className="row g-2">
                                     <div className="col-md-6">
-                                        <label className="form-label">Size</label>
+                                        <label className="form-label">Rozměr</label>
                                         <input
                                             className="form-control"
                                             value={editForm.size || ""}
@@ -292,7 +292,7 @@ function Products({
                                         />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label">Brand</label>
+                                        <label className="form-label">Značka</label>
                                         <input
                                             className="form-control"
                                             value={editForm.brand || ""}
@@ -302,7 +302,7 @@ function Products({
                                         />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label">Pattern</label>
+                                        <label className="form-label">Dezén</label>
                                         <input
                                             className="form-control"
                                             value={editForm.pattern || ""}
@@ -332,7 +332,7 @@ function Products({
                                         />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label">NetPrice</label>
+                                        <label className="form-label">Cena bez DPH</label>
                                         <input
                                             className="form-control"
                                             value={editForm.netPrice || ""}
@@ -342,7 +342,7 @@ function Products({
                                         />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label">Stock</label>
+                                        <label className="form-label">Množství</label>
                                         <input
                                             className="form-control"
                                             value={editForm.stock || ""}
@@ -358,10 +358,10 @@ function Products({
                                     className="btn btn-secondary"
                                     onClick={() => setShowModal(false)}
                                 >
-                                    Close
+                                    Zavři
                                 </button>
                                 <button className="btn btn-primary" onClick={handleUpdate}>
-                                    Update
+                                   Ulož
                                 </button>
                             </div>
                         </div>
@@ -369,21 +369,21 @@ function Products({
                 </div>
             )}
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h4 className="fw-bold mb-0">Product List</h4>
+                <h4 className="fw-bold mb-0">Seznam produktů</h4>
                 <div className="w-50">
                     <input
                         type="search"
                         className="form-control"
-                        placeholder="Search product"
+                        placeholder="Hledej produkt"
                         value={filterText}
                         onChange={handleFilterChange}
                     ></input>
                 </div>
                 <button
                     className="btn btn-primary"
-                    onClick={() => setActivePage("Add product")}
+                    onClick={() => setActivePage("Přidat produkt")}
                 >
-                    <i className="bi bi-plus-lg me-2"></i>New Product
+                    <i className="bi bi-plus-lg me-2"></i>Nový produkt
                 </button>
             </div>
             <div className="card border-0 shadow-sm overflow-hidden">
@@ -391,13 +391,13 @@ function Products({
                     <table className="table table-hover mb-0 ">
                         <thead>
                             <tr>
-                                <th>Product Size</th>
-                                <th>Product Name</th>
+                                <th>Rozměr</th>
+                                <th>Název</th>
                                 <th>SI/LI</th>
-                                <th>Price</th>
-                                <th>Stock</th>
+                                <th>Cena bez DPH</th>
+                                <th>Množství</th>
                                 {user?.role === "admin" && (
-                                    <th className="text-end">Actions</th>
+                                    <th className="text-end">Akce</th>
                                 )}
                             </tr>
                         </thead>

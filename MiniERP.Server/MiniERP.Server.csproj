@@ -24,6 +24,10 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Plan\" />
+  </ItemGroup>
 	<Target Name="BuildFrontend" BeforeTargets="Publish">
 		<Exec Command="npm run build" WorkingDirectory="$(SolutionDir)minierp.client" />
 	</Target>

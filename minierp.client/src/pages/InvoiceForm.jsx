@@ -25,8 +25,8 @@ const createDefaultInvoiceForm = () => {
         totalAmountExVat: 0,
         vatAmount: 0,
         totalAmountIncVat: 0,
-        currencyCode: "CZK",
-        status: "unpaid",
+        currencyCode: "Kč",
+        status: "nezaplaceno",
     };
 };
 
@@ -180,11 +180,11 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
 
     const handleCreateInvoice = async () => {
         if (!form.customerId) {
-            alert("Select customer");
+            alert("Vyberte zákazníka");
             return;
         }
         if (items.length === 0) {
-            alert("Add items");
+            alert("Přidejte položky");
             return;
         }
 
@@ -254,7 +254,7 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
             <div className="modal-dialog modal-lg">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title">Create Invoice</h5>
+                        <h5 className="modal-title">Vytvořit Fakturu</h5>
                         <button
                             className="btn-close"
                             onClick={handleClose}
@@ -266,7 +266,7 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
 
                         <div className="row g-3 mb-4">
                             <div className="col-md-4">
-                                <label className="form-label small fw-bold text-uppercase text-muted">Issue Date</label>
+                                <label className="form-label small fw-bold text-uppercase text-muted">Datum vystavení</label>
                                 <input
                                     type="date"
                                     className="form-control"
@@ -278,7 +278,7 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
                                 />
                             </div>
                             <div className="col-md-4">
-                                <label className="form-label small fw-bold text-uppercase text-muted">Due Date</label>
+                                <label className="form-label small fw-bold text-uppercase text-muted">Datum splatnosti</label>
                                 <input
                                     type="date"
                                     className="form-control"
@@ -290,29 +290,23 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
                                 />
                             </div>
                             <div className="col-md-4">
-                                <label className="form-label small fw-bold text-uppercase text-muted">Status</label>
-                                <select
-                                    className="form-select"
-                                    value={form.status}
-                                    onChange={(e) => setForm({ ...form, status: e.target.value })}
-                                    disabled={loading}
-                                >
-                                    <option value="draft">Draft</option>
-                                    <option value="issued">Issued</option>
-                                    <option value="paid">Paid</option>
-                                </select>
+                                <label className="form-label small fw-bold text-uppercase text-muted">Stav</label>
+                                <select value={form.status}>
+                                <option value="nezaplaceno">Nezaplaceno</option>
+                                <option value="zaplaceno">Zaplaceno</option>
+                            </select>   
                             </div>
                         </div>
 
                         <div className="mb-4">
-                            <label className="form-label small fw-bold text-uppercase text-muted">Customer</label>
+                            <label className="form-label small fw-bold text-uppercase text-muted">Zákazník</label>
                             <select
                                 className="form-select"
                                 value={form.customerId}
                                 onChange={handleCustomerChange}
                                 disabled={loading}
                             >
-                                <option value="">— Select customer —</option>
+                                <option value="">— Vyberte zákazníka —</option>
                                 {customers.map((c) => (
                                     <option key={c.id} value={c.id}>
                                         {c.name}
@@ -322,14 +316,14 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
                         </div>
 
                         <div className="border-top pt-4">
-                            <h6 className="fw-bold mb-3">Invoice Items</h6>
+                            <h6 className="fw-bold mb-3">Položky faktury</h6>
                             <div className="row g-2 mb-3 align-items-end">
                                 <div className="col-md-4">
-                                    <label className="form-label small">Product</label>
+                                    <label className="form-label small">Zboží</label>
                                     <input
                                         type="text"
                                         className="form-control"
-                                        placeholder="Search by ID or name..."
+                                        placeholder="Vyhledat zboží..."
                                         list="product-list"
                                         value={currentItem.productSearch || ''}
                                         onChange={(e) => {
@@ -339,8 +333,8 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
                                                 productSearch: searchValue,
                                             });
 
-                                            const foundProduct = products.find(p => 
-                                                p.id.toString() === searchValue || 
+                                            const foundProduct = products.find(p =>
+                                                p.id.toString() === searchValue ||
                                                 getProductDisplayText(p).toLowerCase().includes(searchValue.toLowerCase())
                                             );
 
@@ -362,11 +356,11 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
                                     </datalist>
                                 </div>
                                 <div className="col-md-3">
-                                    <label className="form-label small">Qty</label>
+                                    <label className="form-label small">Množství</label>
                                     <input
                                         type="number"
                                         className="form-control"
-                                        placeholder="Qty"
+                                        placeholder="Množství"
                                         value={currentItem.quantity}
                                         onChange={(e) =>
                                             setCurrentItem({ ...currentItem, quantity: e.target.value })
@@ -375,11 +369,11 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
                                     />
                                 </div>
                                 <div className="col-md-3">
-                                    <label className="form-label small">Unit Price</label>
+                                    <label className="form-label small">Jednotková cena</label>
                                     <input
                                         type="number"
                                         className="form-control"
-                                        placeholder="Price"
+                                        placeholder="Cena"
                                         value={currentItem.unitPrice}
                                         onChange={(e) =>
                                             setCurrentItem({
@@ -396,7 +390,7 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
                                         onClick={handleAddItem}
                                         disabled={loading}
                                     >
-                                        <i className="bi bi-plus-lg me-1"></i>Add
+                                        <i className="bi bi-plus-lg me-1"></i>Přidat
                                     </button>
                                 </div>
                             </div>
@@ -406,11 +400,11 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
                                     <table className="table table-hover align-middle">
                                         <thead className="table-light">
                                             <tr>
-                                                <th>Product</th>
-                                                <th className="text-center">Qty</th>
-                                                <th className="text-end">Unit Price</th>
-                                                <th className="text-end">Total</th>
-                                                <th className="text-end">Action</th>
+                                                <th>Zboží</th>
+                                                <th className="text-center">Množství</th>
+                                                <th className="text-end">Jednotková cena</th>
+                                                <th className="text-end">Celkem</th>
+                                                <th className="text-end">Akce</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -426,7 +420,6 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
                                                                 style={{ width: "80px", margin: "0 auto" }}
                                                                 value={item.quantity}
                                                                 onChange={(e) =>
-                                                                    
                                                                     handleUpdateItem(index, 'quantity', e.target.value)}
                                                                 disabled={loading}
                                                             />
@@ -436,7 +429,7 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
                                                                 type="number"
                                                                 className="form-control"
                                                                 style={{ width: "120px", marginLeft: "auto" }}
-                                                                value={item.unitPrice}                        
+                                                                value={item.unitPrice}
                                                                 onChange={(e) => handleUpdateItem(index, 'unitPrice', e.target.value)}
                                                                 onBlur={(e) => handleUpdateItem(index, 'unitPrice', parseFloat(e.target.value) || 0)}
                                                                 disabled={loading}
@@ -466,17 +459,17 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
                                 <div className="card bg-light border-0">
                                     <div className="card-body">
                                         <div className="d-flex justify-content-between mb-2">
-                                            <span className="text-muted">Subtotal (Ex VAT):</span>
+                                            <span className="text-muted">Celkem bez DPH:</span>
                                             <span className="fw-bold">{formatPrice(form.totalAmountExVat)}</span>
                                         </div>
                                         <div className="d-flex justify-content-between mb-2">
-                                            <span className="text-muted">VAT:</span>
-                                            <span className="fw-bold">{formatPrice(form.vatAmount)} </span>
+                                            <span className="text-muted">DPH:</span>
+                                            <span className="fw-bold">{formatPrice(form.vatAmount)}</span>
                                         </div>
                                         <hr />
                                         <div className="d-flex justify-content-between align-items-center">
-                                            <span className="h6 mb-0 fw-bold">Total Amount:</span>
-                                            <span className="h5 mb-0 fw-bold text-primary">{formatPrice(form.totalAmountIncVat)} </span>
+                                            <span className="h6 mb-0 fw-bold">Celkem s DPH:</span>
+                                            <span className="h5 mb-0 fw-bold text-primary">{formatPrice(form.totalAmountIncVat)}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -489,7 +482,7 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
                             onClick={handleClose}
                             disabled={loading}
                         >
-                            Cancel
+                            Zrušit
                         </button>
                         <button
                             className="btn btn-primary"
@@ -499,11 +492,11 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess }) {
                             {loading ? (
                                 <>
                                     <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                    Creating...
+                                    Vytváření...
                                 </>
                             ) : (
                                 <>
-                                    <i className="bi bi-check2-circle me-2"></i>Create Invoice
+                                    <i className="bi bi-check2-circle me-2"></i>Vytvořit fakturu
                                 </>
                             )}
                         </button>

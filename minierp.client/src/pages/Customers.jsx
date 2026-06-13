@@ -98,9 +98,9 @@ function Customers({ view, setActivePage, user }) {
         return (
             <div>
                 <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h4 className="fw-bold mb-0">Add Customer</h4>
-                    <button className="btn btn-outline-secondary" onClick={() => setActivePage('Customer list')}>
-                        <i className="bi bi-arrow-left me-2"></i>Back to List
+                    <h4 className="fw-bold mb-0">Přidej zákazníka</h4>
+                    <button className="btn btn-outline-secondary" onClick={() => setActivePage('Seznam firem')}>
+                        <i className="bi bi-arrow-left me-2"></i>Zpět na seznam
                     </button>
                 </div>
                 {error && <div className="alert alert-danger">{error}</div>}
@@ -108,31 +108,31 @@ function Customers({ view, setActivePage, user }) {
                     <div className="card-body p-4">
                         <div className="row g-3">
                             <div className="col-md-6">
-                                <label className="form-label small fw-bold text-uppercase text-muted">Customer Name</label>
+                                <label className="form-label small fw-bold text-uppercase text-muted">Název zákazníka</label>
                                 <div className="input-group">
                                     <span className="input-group-text bg-white"><i className="bi bi-person text-muted"></i></span>
                                     <input
                                         className="form-control"
-                                        placeholder="Full Name"
+                                        placeholder="Firma s.r.o."
                                         value={form.name}
                                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                                     />
                                 </div>
                             </div>
                             <div className="col-md-6">
-                                <label className="form-label small fw-bold text-uppercase text-muted">Email Address</label>
+                                <label className="form-label small fw-bold text-uppercase text-muted">Email</label>
                                 <div className="input-group">
                                     <span className="input-group-text bg-white"><i className="bi bi-envelope text-muted"></i></span>
                                     <input
                                         className="form-control"
-                                        placeholder="email@example.com"
+                                        placeholder="email@email.com"
                                         value={form.email}
                                         onChange={(e) => setForm({ ...form, email: e.target.value })}
                                     />
                                 </div>
                             </div>
                             <div className="col-md-6">
-                                <label className="form-label small fw-bold text-uppercase text-muted">Phone Number</label>
+                                <label className="form-label small fw-bold text-uppercase text-muted">Mobil</label>
                                 <div className="input-group">
                                     <span className="input-group-text bg-white"><i className="bi bi-telephone text-muted"></i></span>
                                     <input
@@ -144,19 +144,19 @@ function Customers({ view, setActivePage, user }) {
                                 </div>
                             </div>
                             <div className="col-12 mt-4">
-                                <h6 className="fw-bold mb-3 border-bottom pb-2">Address Details</h6>
+                                <h6 className="fw-bold mb-3 border-bottom pb-2">Adresa</h6>
                             </div>
                             <div className="col-md-8">
-                                <label className="form-label small fw-bold text-uppercase text-muted">Street</label>
+                                <label className="form-label small fw-bold text-uppercase text-muted">Ulice</label>
                                 <input
                                     className="form-control"
-                                    placeholder="Street and house number"
+                                    placeholder="Název a č. popisné"
                                     value={form.street}
                                     onChange={(e) => setForm({ ...form, street: e.target.value })}
                                 />
                             </div>
                             <div className="col-md-4">
-                                <label className="form-label small fw-bold text-uppercase text-muted">ZIP Code</label>
+                                <label className="form-label small fw-bold text-uppercase text-muted">PSČ</label>
                                 <input
                                     className="form-control"
                                     placeholder="123 45"
@@ -165,10 +165,10 @@ function Customers({ view, setActivePage, user }) {
                                 />
                             </div>
                             <div className="col-md-12">
-                                <label className="form-label small fw-bold text-uppercase text-muted">City</label>
+                                <label className="form-label small fw-bold text-uppercase text-muted">Město</label>
                                 <input
                                     className="form-control"
-                                    placeholder="City"
+                                    placeholder="Ostrava"
                                     value={form.city}
                                     onChange={(e) => setForm({ ...form, city: e.target.value })}
                                 />
@@ -176,7 +176,7 @@ function Customers({ view, setActivePage, user }) {
                         </div>
                         <div className="mt-4 pt-3 border-top">
                             <button className="btn btn-primary btn-lg w-100 fw-bold" onClick={handleSubmit}>
-                                <i className="bi bi-person-plus me-2"></i>Create Customer
+                                <i className="bi bi-person-plus me-2"></i>Vytvoř zákazníka
                             </button>
                         </div>
                     </div>
@@ -206,7 +206,7 @@ function Customers({ view, setActivePage, user }) {
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h5 className="modal-title">Edit Customer</h5>
+                                <h5 className="modal-title">Edituj zákazníka</h5>
                                 <button
                                     className="btn-close"
                                     onClick={() => setShowModal(false)}
@@ -215,7 +215,7 @@ function Customers({ view, setActivePage, user }) {
                             <div className="modal-body">
                                 <div className="row g-2">
                                     <div className="col-md-6">
-                                        <label className="form-label">Name</label>
+                                        <label className="form-label">Název</label>
                                         <input
                                             className="form-control"
                                             value={editForm.name || ""}
@@ -235,7 +235,7 @@ function Customers({ view, setActivePage, user }) {
                                         />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label fw-bold">Phone</label>
+                                        <label className="form-label fw-bold">Mobil</label>
                                         <input
                                             className="form-control"
                                             value={editForm.phone || ""}
@@ -245,7 +245,7 @@ function Customers({ view, setActivePage, user }) {
                                         />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label fw-bold">Address</label>
+                                        <label className="form-label fw-bold">Adresa</label>
                                         <input
                                             className="form-control"
                                             value={editForm.street || ""}
@@ -255,7 +255,7 @@ function Customers({ view, setActivePage, user }) {
                                         />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label fw-bold">City</label>
+                                        <label className="form-label fw-bold">Město</label>
                                         <input
                                             className="form-control"
                                             value={editForm.city || ""}
@@ -265,7 +265,7 @@ function Customers({ view, setActivePage, user }) {
                                         />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label fw-bold">ZIP Code</label>
+                                        <label className="form-label fw-bold">PSČ</label>
                                         <input
                                             className="form-control"
                                             value={editForm.zip || ""}
@@ -281,10 +281,10 @@ function Customers({ view, setActivePage, user }) {
                                     className="btn btn-secondary"
                                     onClick={() => setShowModal(false)}
                                 >
-                                    Close
+                                    Zavřít
                                 </button>
                                 <button className="btn btn-primary" onClick={handleUpdate}>
-                                    Update
+                                    Ulož
                                 </button>
                             </div>
                         </div>
@@ -292,9 +292,9 @@ function Customers({ view, setActivePage, user }) {
                 </div>
             )}
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h4 className="fw-bold mb-0">Customer List</h4>
-                <button className="btn btn-primary" onClick={() => setActivePage('Add customer')}>
-                    <i className="bi bi-plus-lg me-2"></i>New Customer
+                <h4 className="fw-bold mb-0">Adresář Firem</h4>
+                <button className="btn btn-primary" onClick={() => setActivePage('Přidat firmu')}>
+                    <i className="bi bi-plus-lg me-2"></i>Nový zákazník
                 </button>
             </div>
             <div className="card border-0 shadow-sm overflow-hidden">
@@ -302,9 +302,9 @@ function Customers({ view, setActivePage, user }) {
                     <table className="table table-hover mb-0">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Contact Information</th>
-                                <th>Location</th>
+                                <th>Název</th>
+                                <th>Kontakt</th>
+                                <th>Město</th>
                                 {user?.role === 'admin' && <th className="text-end">Actions</th>}
                             </tr>
                         </thead>

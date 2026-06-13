@@ -29,9 +29,16 @@ public class Program {
         builder.Services.AddScoped<CustomerService>();
         builder.Services.AddCors(options => {
             options.AddPolicy("AllowReact", policy => {
-                policy.WithOrigins("https://localhost:5173", "https://myminierp.runasp.net/").AllowAnyHeader()
-                      .AllowAnyMethod();
+                policy.WithOrigins("https://localhost:5173", "https://myminierp.runasp.net")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
             });
+        });
+        builder.Services.ConfigureApplicationCookie(options => {
+            options.Cookie.Name = "AspNetCore.Identity.Application";
+            options.ExpireTimeSpan = TimeSpan.FromMinutes(60); // Nastaveni casoveho limitu pro cookie, po kterem bude uzivatel odhlasen
+            options.SlidingExpiration = true; // Pokud je uzivatel aktivni, casovy limit se resetuje a cookie bude platna dalsich 2 minuty
         });
 
         builder.Services.AddControllers()
@@ -48,15 +55,14 @@ public class Program {
         using (var scope = app.Services.CreateScope()) {
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            
+
             context.Database.EnsureCreated();
 
         }
 
         app.UseDefaultFiles();
         app.UseStaticFiles(new StaticFileOptions {
-            OnPrepareResponse = ctx =>
-            {
+            OnPrepareResponse = ctx => {
                 var path = ctx.File.Name;
 
                 if (path.EndsWith(".html")) {
@@ -77,6 +83,7 @@ public class Program {
 
         app.UseHttpsRedirection();
         app.UseCors("AllowReact");
+        app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
         app.MapFallbackToFile("/index.html");

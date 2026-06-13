@@ -2,8 +2,10 @@
 using MiniERP.Server.Models;
 using MiniERP.Server.DTOs;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MiniERP.Server.Controllers;
+
 
 [ApiController]
 [Route("api/[controller]")]
@@ -20,23 +22,25 @@ public class AuthController : ControllerBase {
     public async Task<IActionResult> Login(LoginRequestDTO request) {
         var user = await _userManager.FindByNameAsync(request.Username);
 
-        if (user == null) {
+        if (user == null)
             return Unauthorized(new { message = "Neplatné jméno nebo heslo" });
-        }
 
-        var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+        var result = await _signInManager.PasswordSignInAsync(
+            request.Username,
+            request.Password,
+            isPersistent: true,  
+            lockoutOnFailure: false
+        );
 
-        if (!result.Succeeded) {
+        if (!result.Succeeded)
             return Unauthorized(new { message = "Neplatné jméno nebo heslo" });
-        }
 
-        var response = new LoginResponseDTO {
-            Username = user.UserName ?? string.Empty,
-            Role = user.Role,
-            Token = "fake-jwt-token" // Pro demo účely
-        };
+        var roles = await _userManager.GetRolesAsync(user);
 
-        return Ok(response);
+        return Ok(new {
+            username = user.UserName,
+            role = user.Role  
+        });
     }
 
     [HttpPost("logout")]

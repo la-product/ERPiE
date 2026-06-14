@@ -23,7 +23,7 @@ Webová ERP aplikace určená pro **prodejce pneumatik**. Umožňuje správu adr
 
 ### Adresář firem
 - [x] Seznam firem s filtrováním dle názvu a IČO
-- [x] Přidání a úprava firmy (název, adresa, kontakt, IČO, DIČ)
+- [x] Přidání a úprava firmy (název, adresa, kontakt, IČO)
 - [x] Označení firmy jako dodavatele (slouží pro výběr v příjemkách)
 - [x] Validace IČO — právě 8 číslic
 
@@ -47,7 +47,7 @@ Webová ERP aplikace určená pro **prodejce pneumatik**. Umožňuje správu adr
 - [x] Detail příjemky s rozpisem položek
 
 ### Dodací listy
-- [x] Vytvoření dodacího listu (výběr zákazníka, produktů, dopravy, platby)
+- [x] Vytvoření dodacího listu (výběr zákazníka, produktů, dopravy a platby)
 - [x] Po vytvoření DL se produkty **automaticky odečtou ze skladu**
 - [x] Zpětná synchronizace skladu pro DL vytvořené před zavedením skladu
 - [x] Změna stavu DL (Nový → Zpracovává se → Dokončeno)

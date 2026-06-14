@@ -12,9 +12,11 @@ function Sidebar({ activePage, setActivePage, user }) {
     },
     {
       label: "Produkty",
-      icon: "bi bi-box",
+      icon: "bi bi-tags",
       items: ["Seznam produktů", "Přidat produkt"],
     },
+    { label: "Sklad", icon: "bi bi-box-seam", items: ["Sklad — vše"] },
+    { label: "Příjemky", icon: "bi bi-box-arrow-in-down", items: ["Seznam příjemek", "Vytvořit příjemku"] },
     { label: "Dodací list", icon: "bi bi-cart", items: ["Seznam DL", "Přidat DL"] },
     {
       label: "Faktury",

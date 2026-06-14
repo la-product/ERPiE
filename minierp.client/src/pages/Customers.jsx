@@ -1,17 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
-import { HashRouter, Routes, Route } from 'react-router-dom';
 import {
     getCustomers,
     addCustomer,
     updateCustomer,
     deleteCustomer,
-   
 } from "../services/customerService";
 import {
     mapCustomerDtoToForm
 } from "../mappers/customerMapper";
-import { useNavigate } from 'react-router-dom';
-
 
 function Customers({ view, setActivePage, user }) {
     const [customers, setCustomers] = useState([]);
@@ -22,12 +18,14 @@ function Customers({ view, setActivePage, user }) {
         city: "",
         zip: "",
         phone: "",
+        ico: "",
+        isSupplier: false,
     });
     const [showModal, setShowModal] = useState(false);
     const [editForm, setEditForm] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-   
+    const [filterText, setFilterText] = useState("");
 
     const loadCustomers = useCallback(async () => {
         try {
@@ -42,7 +40,6 @@ function Customers({ view, setActivePage, user }) {
     }, []);
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         loadCustomers();
     }, [loadCustomers]);
 
@@ -76,7 +73,13 @@ function Customers({ view, setActivePage, user }) {
         }
     };
 
+    const validateIco = (ico) => /^\d{8}$/.test(ico);
+
     const handleSubmit = async () => {
+        if (form.ico && !validateIco(form.ico)) {
+            setError("IČO musí obsahovat právě 8 číslic (pouze číslice).");
+            return;
+        }
         try {
             const newCustomer = await addCustomer(form);
             setCustomers([...customers, newCustomer]);
@@ -87,12 +90,24 @@ function Customers({ view, setActivePage, user }) {
                 city: "",
                 zip: "",
                 phone: "",
+                ico: "",
+                isSupplier: false,
             });
             setError(null);
         } catch (err) {
             setError(err.message);
         }
     };
+
+    const handleFilterChange = (event) => {
+        setFilterText(event.target.value);
+    };
+
+    const filteredCustomers = customers.filter(
+        (customer) =>
+            customer.name.toLowerCase().includes(filterText.toLowerCase()) ||
+            (customer.ico && customer.ico.toLowerCase().includes(filterText.toLowerCase())),
+    );
 
     if (view === "add") {
         return (
@@ -143,7 +158,35 @@ function Customers({ view, setActivePage, user }) {
                                     />
                                 </div>
                             </div>
-                            <div className="col-12 mt-4">
+                            <div className="col-md-4">
+                                <label className="form-label small fw-bold text-uppercase text-muted">IČO</label>
+                                <div className="input-group">
+                                    <span className="input-group-text bg-white"><i className="bi bi-hash text-muted"></i></span>
+                                    <input
+                                        className={`form-control${form.ico && !validateIco(form.ico) ? " is-invalid" : ""}`}
+                                        placeholder="12345678"
+                                        maxLength={8}
+                                        value={form.ico}
+                                        onChange={(e) => setForm({ ...form, ico: e.target.value.replace(/\D/g, "") })}
+                                    />
+                                    {form.ico && !validateIco(form.ico) && (
+                                        <div className="invalid-feedback">IČO musí mít přesně 8 číslic.</div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="col-md-2 d-flex align-items-end pb-1">
+                                <div className="form-check form-switch">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="isSupplier"
+                                        checked={form.isSupplier}
+                                        onChange={(e) => setForm({ ...form, isSupplier: e.target.checked })}
+                                    />
+                                    <label className="form-check-label" htmlFor="isSupplier">Dodavatel</label>
+                                </div>
+                            </div>
+                            <div className="col-12 mt-2">
                                 <h6 className="fw-bold mb-3 border-bottom pb-2">Adresa</h6>
                             </div>
                             <div className="col-md-8">
@@ -188,8 +231,8 @@ function Customers({ view, setActivePage, user }) {
     if (loading) {
         return (
             <div className="d-flex justify-content-center align-items-center h-100">
-                <div className="spinner-border text-primary" role="status" style={{ color: 'var(--primary) !important' }}>
-                    <span className="visually-hidden">Loading...</span>
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Načítání...</span>
                 </div>
             </div>
         );
@@ -245,7 +288,17 @@ function Customers({ view, setActivePage, user }) {
                                         />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label fw-bold">Adresa</label>
+                                        <label className="form-label fw-bold">IČO</label>
+                                        <input
+                                            className="form-control"
+                                            value={editForm.ico || ""}
+                                            onChange={(e) =>
+                                                setEditForm({ ...editForm, ico: e.target.value })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-bold">Ulice</label>
                                         <input
                                             className="form-control"
                                             value={editForm.street || ""}
@@ -274,6 +327,20 @@ function Customers({ view, setActivePage, user }) {
                                             }
                                         />
                                     </div>
+                                    <div className="col-md-6 d-flex align-items-end pb-1">
+                                        <div className="form-check form-switch">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                id="editIsSupplier"
+                                                checked={editForm.isSupplier || false}
+                                                onChange={(e) =>
+                                                    setEditForm({ ...editForm, isSupplier: e.target.checked })
+                                                }
+                                            />
+                                            <label className="form-check-label" htmlFor="editIsSupplier">Dodavatel</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div className="modal-footer">
@@ -293,6 +360,15 @@ function Customers({ view, setActivePage, user }) {
             )}
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h4 className="fw-bold mb-0">Adresář Firem</h4>
+                <div className="w-50">
+                    <input
+                        type="search"
+                        className="form-control"
+                        placeholder="Hledej podle názvu nebo IČO"
+                        value={filterText}
+                        onChange={handleFilterChange}
+                    />
+                </div>
                 <button className="btn btn-primary" onClick={() => setActivePage('Přidat firmu')}>
                     <i className="bi bi-plus-lg me-2"></i>Nový zákazník
                 </button>
@@ -303,15 +379,22 @@ function Customers({ view, setActivePage, user }) {
                         <thead>
                             <tr>
                                 <th>Název</th>
+                                <th>IČO</th>
                                 <th>Kontakt</th>
                                 <th>Město</th>
-                                {user?.role === 'admin' && <th className="text-end">Actions</th>}
+                                {user?.role === 'admin' && <th className="text-end">Akce</th>}
                             </tr>
                         </thead>
                         <tbody>
-                            {customers.map((customer) => (
+                            {filteredCustomers.map((customer) => (
                                 <tr key={customer.id}>
-                                    <td className="fw-bold">{customer.name}</td>
+                                    <td className="fw-bold">
+                                        {customer.name}
+                                        {customer.isSupplier && (
+                                            <span className="badge bg-info ms-2">Dodavatel</span>
+                                        )}
+                                    </td>
+                                    <td>{customer.ico}</td>
                                     <td>
                                         <div className="d-flex flex-column">
                                             <span className="text-dark">{customer.email}</span>
@@ -319,22 +402,22 @@ function Customers({ view, setActivePage, user }) {
                                         </div>
                                     </td>
                                     <td>{customer.city}</td>
-                                        {user?.role === 'admin' && (
-                                    <td className="text-end">
-                                        <button
-                                            className="btn btn-sm btn-outline-primary me-2"
-                                            onClick={() => handleEdit(customer)}
-                                        >
-                                            <i className="bi bi-pencil"></i>
-                                        </button>
-                                        <button
-                                            className="btn btn-sm btn-outline-danger"
-                                            onClick={() => handleDelete(customer.id)}
-                                        >
-                                            <i className="bi bi-trash"></i>
-                                        </button>
-                                    </td>
-                                        )}
+                                    {user?.role === 'admin' && (
+                                        <td className="text-end">
+                                            <button
+                                                className="btn btn-sm btn-outline-primary me-2"
+                                                onClick={() => handleEdit(customer)}
+                                            >
+                                                <i className="bi bi-pencil"></i>
+                                            </button>
+                                            <button
+                                                className="btn btn-sm btn-outline-danger"
+                                                onClick={() => handleDelete(customer.id)}
+                                            >
+                                                <i className="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    )}
                                 </tr>
                             ))}
                         </tbody>

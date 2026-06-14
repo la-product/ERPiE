@@ -12,7 +12,10 @@ namespace MiniERP.Server.Data {
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<InvoiceItem> InvoiceItems { get; set; }
-     
+        public DbSet<WarehouseItem> WarehouseItems { get; set; }
+        public DbSet<Receipt> Receipts { get; set; }
+        public DbSet<ReceiptItem> ReceiptItems { get; set; }
+
     }
 }
 

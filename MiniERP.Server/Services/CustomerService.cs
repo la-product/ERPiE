@@ -21,7 +21,9 @@ public class CustomerService {
                 City = c.City,
                 Zip = c.Zip,
                 Email = c.Email,
-                Phone = c.Phone
+                Phone = c.Phone,
+                Ico = c.Ico,            
+                IsSupplier = c.IsSupplier
             }).ToList();
     }
 
@@ -40,6 +42,8 @@ public class CustomerService {
             Zip = customer.Zip,
             Email = customer.Email,
             Phone = customer.Phone,
+            Ico = customer.Ico,         
+            IsSupplier = customer.IsSupplier,
             Orders = customer.Orders.Select(o => new OrderDTO {
                 Id = o.Id,
                 CustomerId = o.CustomerId,
@@ -60,7 +64,9 @@ public class CustomerService {
             City = createDto.City,
             Zip = createDto.Zip,
             Email = createDto.Email,
-            Phone = createDto.Phone
+            Phone = createDto.Phone,
+            Ico = createDto.Ico,
+            IsSupplier = createDto.IsSupplier
         };
 
         _context.Customers.Add(customer);
@@ -73,7 +79,9 @@ public class CustomerService {
             City = customer.City,
             Zip = customer.Zip,
             Email = customer.Email,
-            Phone = customer.Phone
+            Phone = customer.Phone,
+            Ico = customer.Ico,
+            IsSupplier = customer.IsSupplier
         };
     }
 
@@ -87,6 +95,8 @@ public class CustomerService {
         if (!string.IsNullOrEmpty(updateDto.Zip)) existing.Zip = updateDto.Zip;
         if (!string.IsNullOrEmpty(updateDto.Email)) existing.Email = updateDto.Email;
         if (!string.IsNullOrEmpty(updateDto.Phone)) existing.Phone = updateDto.Phone;
+        if (!string.IsNullOrEmpty(updateDto.Ico)) existing.Ico = updateDto.Ico;
+        if (updateDto.IsSupplier.HasValue) existing.IsSupplier = updateDto.IsSupplier.Value;
 
         _context.SaveChanges();
 
@@ -97,7 +107,10 @@ public class CustomerService {
             City = existing.City,
             Zip = existing.Zip,
             Email = existing.Email,
-            Phone = existing.Phone
+            Phone = existing.Phone,
+            Ico = existing.Ico,
+            IsSupplier = existing.IsSupplier
+   
         };
     }
 

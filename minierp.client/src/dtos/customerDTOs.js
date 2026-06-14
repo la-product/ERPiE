@@ -7,6 +7,8 @@
  * @property {string} zip
  * @property {string} email
  * @property {string} phone
+ * @property {string} ico
+ * @property {boolean} isSupplier
  */
 
 /**
@@ -17,6 +19,8 @@
  * @property {string} zip
  * @property {string} email
  * @property {string} phone
+ * @property {string} ico
+ * @property {boolean} isSupplier
  */
 
 /**
@@ -27,6 +31,8 @@
  * @property {string} [zip]
  * @property {string} [email]
  * @property {string} [phone]
+ * @property {string} [ico]
+ * @property {boolean} [isSupplier]
  */
 
 /**
@@ -38,7 +44,9 @@
  * @property {string} zip
  * @property {string} email
  * @property {string} phone
+ * @property {string} ico
+ * @property {boolean} isSupplier
  * @property {Array} orders
  */
 
-export {};
+export { };

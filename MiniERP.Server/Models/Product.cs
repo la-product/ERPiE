@@ -1,4 +1,4 @@
-﻿namespace MiniERP.Server.Models;
+namespace MiniERP.Server.Models;
 
 public class Product {
     public int Id { get; set; }
@@ -8,7 +8,7 @@ public class Product {
     public int Si { get; set; }
     public string? Li { get;set;  }
     public double NetPrice { get; set; }
-    public int Stock { get; set; }
+    public string? Category { get; set; }
 
     public List<OrderItem> OrderItems { get; set; } = new();
 }

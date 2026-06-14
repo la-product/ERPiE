@@ -8,8 +8,16 @@ import {
 import {
     mapProductDtoToForm,
     getProductDisplayText,
+    CATEGORIES,
+    getCategoryLabel,
 } from "../mappers/productMapper";
 import { formatPrice } from "../utils/formatters";
+
+const CATEGORY_BADGE = {
+    zimni:     { style: { backgroundColor: "#2563eb" },         icon: "bi-snow",     title: "Zimní" },
+    letni:     { style: { backgroundColor: "#f59e0b" },         icon: "bi-sun-fill", title: "Letní" },
+    celorocni: { style: { backgroundColor: "#10b981" },         icon: null,          title: "Celoroční" },
+};
 
 function Products({
     view,
@@ -27,12 +35,13 @@ function Products({
         si: "",
         li: "",
         netPrice: "",
-        stock: "",
+        category: "",
     });
     const [showModal, setShowModal] = useState(false);
     const [editForm, setEditForm] = useState({});
     const [error, setError] = useState(null);
     const [filterText, setFilterText] = useState("");
+    const [categoryFilter, setCategoryFilter] = useState("");
 
     const loadProducts = useCallback(async () => {
         try {
@@ -94,7 +103,7 @@ function Products({
                 si: "",
                 li: "",
                 netPrice: "",
-                stock: "",
+                category: "",
             });
             setError(null);
         } catch (err) {
@@ -102,15 +111,14 @@ function Products({
         }
     };
 
-    const handleFilterChange = (event) => {
-        setFilterText(event.target.value);
-    };
-
     const filteredProducts = products.filter(
         (product) =>
-            product.size.toLowerCase().includes(filterText.toLocaleLowerCase()) ||
-            product.brand.toLowerCase().includes(filterText.toLocaleLowerCase()) ||
-            product.pattern.toLowerCase().includes(filterText.toLocaleLowerCase()),
+            (categoryFilter === "" || product.category === categoryFilter) &&
+            (
+                product.size?.toLowerCase().includes(filterText.toLowerCase()) ||
+                product.brand?.toLowerCase().includes(filterText.toLowerCase()) ||
+                product.pattern?.toLowerCase().includes(filterText.toLowerCase())
+            ),
     );
 
     if (view == "add") {
@@ -131,7 +139,7 @@ function Products({
                         <div className="row g-3">
                             <div className="col-md-6">
                                 <label className="form-label small fw-bold text-uppercase text-muted">
-                                   Značka
+                                    Značka
                                 </label>
                                 <div className="input-group">
                                     <span className="input-group-text bg-white">
@@ -160,7 +168,7 @@ function Products({
                             </div>
                             <div className="col-md-6">
                                 <label className="form-label small fw-bold text-uppercase text-muted">
-                                   Dezén
+                                    Dezén
                                 </label>
                                 <input
                                     className="form-control"
@@ -220,22 +228,22 @@ function Products({
                             </div>
                             <div className="col-md-6">
                                 <label className="form-label small fw-bold text-uppercase text-muted">
-                                    Množství
+                                    Kategorie
                                 </label>
-                                <div className="input-group">
-                                    <span className="input-group-text bg-white">
-                                        <i className="bi bi-box text-muted"></i>
-                                    </span>
-                                    <input
-                                        className="form-control"
-                                        type="number"
-                                        placeholder="0"
-                                        value={form.stock}
-                                        onChange={(e) =>
-                                            setForm({ ...form, stock: e.target.value })
-                                        }
-                                    />
-                                </div>
+                                <select
+                                    className="form-select"
+                                    value={form.category}
+                                    onChange={(e) =>
+                                        setForm({ ...form, category: e.target.value })
+                                    }
+                                >
+                                    <option value="">— vyberte kategorii —</option>
+                                    {CATEGORIES.map((c) => (
+                                        <option key={c.value} value={c.value}>
+                                            {c.label}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
                         <div className="mt-4 pt-3 border-top">
@@ -342,14 +350,21 @@ function Products({
                                         />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label">Množství</label>
-                                        <input
-                                            className="form-control"
-                                            value={editForm.stock || ""}
+                                        <label className="form-label">Kategorie</label>
+                                        <select
+                                            className="form-select"
+                                            value={editForm.category || ""}
                                             onChange={(e) =>
-                                                setEditForm({ ...editForm, stock: e.target.value })
+                                                setEditForm({ ...editForm, category: e.target.value })
                                             }
-                                        />
+                                        >
+                                            <option value="">— vyberte kategorii —</option>
+                                            {CATEGORIES.map((c) => (
+                                                <option key={c.value} value={c.value}>
+                                                    {c.label}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -361,7 +376,7 @@ function Products({
                                     Zavři
                                 </button>
                                 <button className="btn btn-primary" onClick={handleUpdate}>
-                                   Ulož
+                                    Ulož
                                 </button>
                             </div>
                         </div>
@@ -376,8 +391,8 @@ function Products({
                         className="form-control"
                         placeholder="Hledej produkt"
                         value={filterText}
-                        onChange={handleFilterChange}
-                    ></input>
+                        onChange={(e) => setFilterText(e.target.value)}
+                    />
                 </div>
                 <button
                     className="btn btn-primary"
@@ -388,23 +403,48 @@ function Products({
             </div>
             <div className="card border-0 shadow-sm overflow-hidden">
                 <div className="table-responsive">
-                    <table className="table table-hover mb-0 ">
+                    <table className="table table-hover mb-0">
                         <thead>
                             <tr>
                                 <th>Rozměr</th>
                                 <th>Název</th>
                                 <th>SI/LI</th>
                                 <th>Cena bez DPH</th>
-                                <th>Množství</th>
+                                <th>
+                                    <div className="d-flex align-items-center">
+                                        Kategorie
+                                        <span className="category-filter-wrapper">
+                                            <i
+                                                className="bi bi-chevron-down category-filter-icon"
+                                                style={{
+                                                    color: categoryFilter === "zimni"     ? "#2563eb"
+                                                         : categoryFilter === "letni"     ? "#f59e0b"
+                                                         : categoryFilter === "celorocni" ? "#10b981"
+                                                         : "white"
+                                                }}
+                                            />
+                                            <select
+                                                className="category-filter"
+                                                value={categoryFilter}
+                                                onChange={(e) => setCategoryFilter(e.target.value)}
+                                            >
+                                                <option value="">Vše</option>
+                                                {CATEGORIES.map((c) => (
+                                                    <option key={c.value} value={c.value}>{c.label}</option>
+                                                ))}
+                                            </select>
+                                        </span>
+                                    </div>
+                                </th>
                                 {user?.role === "admin" && (
                                     <th className="text-end">Akce</th>
                                 )}
                             </tr>
                         </thead>
                         <tbody>
-                            {products &&
-                                filteredProducts &&
-                                filteredProducts.map((product) => (
+                            {filteredProducts.map((product) => {
+                                const badge = CATEGORY_BADGE[product.category] ?? { bg: "bg-secondary", label: getCategoryLabel(product.category) };
+                                return (
                                     <tr key={product.id}>
                                         <td>
                                             <div className="fw-bold small">{product.size}</div>
@@ -414,19 +454,25 @@ function Products({
                                         </td>
                                         <td>
                                             <span className="badge bg-light text-dark border fw-medium">
-                                                {product.si}
-                                                {product.li}
+                                                {product.si}{product.li}
                                             </span>
                                         </td>
                                         <td className="fw-bold text-dark">
                                             {formatPrice(product.netPrice)}
                                         </td>
                                         <td>
-                                            <span
-                                                className={`badge ${product.stock > 10 ? "bg-success-light text-success" : "bg-warning-light text-warning"}`}
-                                            >
-                                                {product.stock} pcs
-                                            </span>
+                                            {badge ? (
+                                                <span className="badge text-white" style={badge.style} title={badge.title}>
+                                                    {product.category === "celorocni" ? (
+                                                        <>
+                                                            <i className="bi bi-sun-fill me-1"></i>
+                                                            <i className="bi bi-snow"></i>
+                                                        </>
+                                                    ) : (
+                                                        <i className={`bi ${badge.icon}`}></i>
+                                                    )}
+                                                </span>
+                                            ) : "—"}
                                         </td>
                                         {user?.role === "admin" && (
                                             <td className="text-end">
@@ -445,7 +491,8 @@ function Products({
                                             </td>
                                         )}
                                     </tr>
-                                ))}
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>

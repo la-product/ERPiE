@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MiniERP.Server.Data;
 using MiniERP.Server.DTOs;
 using MiniERP.Server.Models;
@@ -22,7 +22,7 @@ public class ProductService {
                 Si = p.Si,
                 Li = p.Li,
                 NetPrice = p.NetPrice,
-                Stock = p.Stock
+                Category = p.Category
             }).ToList();
     }
 
@@ -41,7 +41,7 @@ public class ProductService {
             Si = product.Si,
             Li = product.Li,
             NetPrice = product.NetPrice,
-            Stock = product.Stock,
+            Category = product.Category,
             OrderItems = product.OrderItems.Select(oi => new OrderItemDTO {
                 Id = oi.Id,
                 OrderId = oi.OrderId,
@@ -60,7 +60,7 @@ public class ProductService {
             Si = createDto.Si,
             Li = createDto.Li,
             NetPrice = createDto.NetPrice,
-            Stock = createDto.Stock
+            Category = createDto.Category
         };
 
         _context.Products.Add(product);
@@ -74,7 +74,7 @@ public class ProductService {
             Si = product.Si,
             Li = product.Li,
             NetPrice = product.NetPrice,
-            Stock = product.Stock
+            Category = product.Category
         };
     }
 
@@ -88,7 +88,7 @@ public class ProductService {
         if (updateDto.Si.HasValue) existing.Si = updateDto.Si.Value;
         if (updateDto.Li != null) existing.Li = updateDto.Li;
         if (updateDto.NetPrice.HasValue) existing.NetPrice = updateDto.NetPrice.Value;
-        if (updateDto.Stock.HasValue) existing.Stock = updateDto.Stock.Value;
+        if (updateDto.Category != null) existing.Category = updateDto.Category;
 
         _context.SaveChanges();
 
@@ -100,7 +100,7 @@ public class ProductService {
             Si = existing.Si,
             Li = existing.Li,
             NetPrice = existing.NetPrice,
-            Stock = existing.Stock
+            Category = existing.Category
         };
     }
 

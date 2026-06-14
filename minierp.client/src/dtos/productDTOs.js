@@ -7,7 +7,7 @@
  * @property {number} si
  * @property {string} [li]
  * @property {number} netPrice
- * @property {number} stock
+ * @property {string} [category]
  */
 
 /**
@@ -18,7 +18,7 @@
  * @property {number} si
  * @property {string} [li]
  * @property {number} netPrice
- * @property {number} stock
+ * @property {string} [category]
  */
 
 /**
@@ -29,7 +29,7 @@
  * @property {number} [si]
  * @property {string} [li]
  * @property {number} [netPrice]
- * @property {number} [stock]
+ * @property {string} [category]
  */
 
 /**
@@ -41,7 +41,7 @@
  * @property {number} si
  * @property {string} [li]
  * @property {number} netPrice
- * @property {number} stock
+ * @property {string} [category]
  * @property {Array} orderItems
  */
 

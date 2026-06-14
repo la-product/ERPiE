@@ -426,3 +426,43 @@ code {
     background-color: var(--primary-light);
     color: var(--primary) !important;
 }
+
+/* Category filter in table header */
+.category-filter-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
+}
+
+.category-filter-icon {
+    font-size: 11px;
+    opacity: 0.8;
+    transition: opacity 0.2s ease, color 0.2s ease;
+    pointer-events: none;
+}
+
+.category-filter-wrapper:hover .category-filter-icon {
+    opacity: 1;
+}
+
+.category-filter {
+    appearance: none;
+    -webkit-appearance: none;
+    position: absolute;
+    inset: -4px -4px -4px -4px;
+    width: calc(100% + 8px);
+    height: calc(100% + 8px);
+    background: transparent;
+    border: none;
+    color: transparent;
+    cursor: pointer;
+    outline: none;
+    padding: 0;
+}
+
+.category-filter option {
+    color: var(--text);
+    background: white;
+    font-size: 14px;
+}

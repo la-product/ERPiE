@@ -7,6 +7,8 @@
     import Invoices from './pages/Invoices';
     import Users from './pages/Users';
     import Login from './pages/Login';
+    import Warehouse from './pages/Warehouse';
+    import Receipts from './pages/Receipts';
 
     function App() {
         const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -19,7 +21,7 @@
         };
 
         const handleLogout = () => {
-        
+
             fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
             setUser(null);
             setIsAuthenticated(false);
@@ -47,8 +49,11 @@
             switch (activePage) {
                 case 'Seznam firem': return <Customers view="list" setActivePage={setActivePage} user={user} />;
                 case 'Přidat firmu': return <Customers view="add" setActivePage={setActivePage} />;
-                case 'Seznam produktů': return <Products view="list" products={products} setProducts={setProducts} loading={productsLoading} setLoading={setProductsLoading} setActivePage={setActivePage} user={user } />;
+                case 'Seznam produktů': return <Products view="list" products={products} setProducts={setProducts} loading={productsLoading} setLoading={setProductsLoading} setActivePage={setActivePage} user={user} />;
                 case 'Přidat produkt': return <Products view="add" products={products} setProducts={setProducts} loading={productsLoading} setLoading={setProductsLoading} setActivePage={setActivePage} user={user} />;
+                case 'Sklad — vše': return <Warehouse user={user} />;
+                case 'Seznam příjemek': return <Receipts view="list" products={products} setActivePage={setActivePage} user={user} />;
+                case 'Vytvořit příjemku': return <Receipts view="add" products={products} setActivePage={setActivePage} user={user} />;
                 case 'Seznam DL': return <Orders view="list" products={products} setProducts={setProducts} setActivePage={setActivePage} user={user} />;
                 case 'Přidat DL': return <Orders view="add" products={products} setProducts={setProducts} setActivePage={setActivePage} />;
                 case 'Seznam FV': return <Invoices view="list" user={user} setActivePage={setActivePage} />;

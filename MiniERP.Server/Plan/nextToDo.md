@@ -6,16 +6,6 @@
 	Pri mi graci se vytvori nove sloupce v tabulce
 ### Seznam prijemek
 	Seznam kde budou uvedeny vsechny prijate faktury
-### Pridat doklad
-	Id
-	Dodavatel
-	Datum prijmu
-	Cislo dokladu faktury prijate
-	Produkt
-	Cena produktu bez DPH + DPH
-	Mnozsvi produktu
-	Je treba po pridani dokladu automaticky pridat polozku na sklad pokud, 
-	pripadne navysit skladouvy stav produktu. Take prijemku uvest v hlavni ucetni knize.
 	
 ## Product List
 	Zrusit skladovou zasobu

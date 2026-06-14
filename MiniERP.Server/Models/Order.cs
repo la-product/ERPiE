@@ -12,6 +12,7 @@ public class Order {
     public double TotalPrice { get; set; }
     public string? Note { get; set; }
     public string Status { get; set; } = "new";
+    public bool WarehouseSynced { get; set; } = false;
     public Customer? Customer { get; set; }
     public List<OrderItem> Items { get; set; } = new();
 

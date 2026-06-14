@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MiniERP.Server.Data;
 
@@ -11,9 +12,11 @@ using MiniERP.Server.Data;
 namespace MiniERP.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260614063518_ReplaceStockWithCategoryOnProduct")]
+    partial class ReplaceStockWithCategoryOnProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -308,9 +311,6 @@ namespace MiniERP.Server.Migrations
                     b.Property<double>("TotalPrice")
                         .HasColumnType("double");
 
-                    b.Property<bool>("WarehouseSynced")
-                        .HasColumnType("tinyint(1)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
@@ -379,77 +379,6 @@ namespace MiniERP.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("MiniERP.Server.Models.Receipt", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("InvoiceNumber")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTimeOffset>("ReceiptDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("SupplierId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("TotalAmountExVat")
-                        .HasColumnType("double");
-
-                    b.Property<double>("TotalAmountIncVat")
-                        .HasColumnType("double");
-
-                    b.Property<double>("VatAmount")
-                        .HasColumnType("double");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SupplierId");
-
-                    b.ToTable("Receipts");
-                });
-
-            modelBuilder.Entity("MiniERP.Server.Models.ReceiptItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReceiptId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("TotalPriceExVat")
-                        .HasColumnType("double");
-
-                    b.Property<double>("TotalPriceIncVat")
-                        .HasColumnType("double");
-
-                    b.Property<double>("UnitPriceExVat")
-                        .HasColumnType("double");
-
-                    b.Property<double>("VatRate")
-                        .HasColumnType("double");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("ReceiptId");
-
-                    b.ToTable("ReceiptItems");
                 });
 
             modelBuilder.Entity("MiniERP.Server.Models.User", b =>
@@ -652,36 +581,6 @@ namespace MiniERP.Server.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("MiniERP.Server.Models.Receipt", b =>
-                {
-                    b.HasOne("MiniERP.Server.Models.Customer", "Supplier")
-                        .WithMany()
-                        .HasForeignKey("SupplierId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Supplier");
-                });
-
-            modelBuilder.Entity("MiniERP.Server.Models.ReceiptItem", b =>
-                {
-                    b.HasOne("MiniERP.Server.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MiniERP.Server.Models.Receipt", "Receipt")
-                        .WithMany("Items")
-                        .HasForeignKey("ReceiptId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("Receipt");
-                });
-
             modelBuilder.Entity("MiniERP.Server.Models.WarehouseItem", b =>
                 {
                     b.HasOne("MiniERP.Server.Models.Product", "Product")
@@ -713,11 +612,6 @@ namespace MiniERP.Server.Migrations
             modelBuilder.Entity("MiniERP.Server.Models.Product", b =>
                 {
                     b.Navigation("OrderItems");
-                });
-
-            modelBuilder.Entity("MiniERP.Server.Models.Receipt", b =>
-                {
-                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

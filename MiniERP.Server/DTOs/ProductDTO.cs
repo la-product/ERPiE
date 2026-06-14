@@ -9,7 +9,7 @@ public class ProductDTO
     public int Si { get; set; }
     public string? Li { get; set; }
     public double NetPrice { get; set; }
-    public int Stock { get; set; }
+    public string? Category { get; set; }
 }
 
 public class CreateProductDTO
@@ -20,7 +20,7 @@ public class CreateProductDTO
     public int Si { get; set; }
     public string? Li { get; set; }
     public double NetPrice { get; set; }
-    public int Stock { get; set; }
+    public string? Category { get; set; }
 }
 
 public class UpdateProductDTO
@@ -31,7 +31,7 @@ public class UpdateProductDTO
     public int? Si { get; set; }
     public string? Li { get; set; }
     public double? NetPrice { get; set; }
-    public int? Stock { get; set; }
+    public string? Category { get; set; }
 }
 
 public class ProductDetailDTO
@@ -43,6 +43,6 @@ public class ProductDetailDTO
     public int Si { get; set; }
     public string? Li { get; set; }
     public double NetPrice { get; set; }
-    public int Stock { get; set; }
+    public string? Category { get; set; }
     public List<OrderItemDTO> OrderItems { get; set; } = new();
 }

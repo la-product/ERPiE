@@ -8,6 +8,8 @@ public class Customer {
     public string Zip {  get; set; }
     public string Email { get; set; }
     public string Phone { get; set; }
+    public string Ico { get; set; } = string.Empty;
+    public bool IsSupplier { get; set; } = false;
     public List<Order> Orders { get; set; } = new();
     public List<Invoice> Invoices { get; set; } = new();
 }

@@ -12,7 +12,7 @@ export const mapProductDtoToForm = (productDto) => {
     si: productDto.si || "",
     li: productDto.li || "",
     netPrice: productDto.netPrice || "",
-    stock: productDto.stock || "",
+    category: productDto.category || "",
   };
 };
 
@@ -29,7 +29,7 @@ export const mapFormToCreateProductDto = (formData) => {
     si: parseInt(formData.si) || 0,
     li: formData.li,
     netPrice: parseFloat(formData.netPrice) || 0,
-    stock: parseInt(formData.stock) || 0,
+    category: formData.category,
   };
 };
 
@@ -47,7 +47,7 @@ export const mapFormToUpdateProductDto = (formData) => {
   if (formData.si) dto.si = parseInt(formData.si);
   if (formData.li) dto.li = formData.li;
   if (formData.netPrice) dto.netPrice = parseFloat(formData.netPrice);
-  if (formData.stock !== "") dto.stock = parseInt(formData.stock);
+  if (formData.category) dto.category = formData.category;
 
   return dto;
 };
@@ -59,4 +59,14 @@ export const mapFormToUpdateProductDto = (formData) => {
  */
 export const getProductDisplayText = (product) => {
   return `${product.size || ""} ${product.brand || ""} ${product.pattern || ""}`.trim();
+};
+
+export const CATEGORIES = [
+  { value: "zimni", label: "Zimní" },
+  { value: "letni", label: "Letní" },
+  { value: "celorocni", label: "Celoroční" },
+];
+
+export const getCategoryLabel = (value) => {
+  return CATEGORIES.find((c) => c.value === value)?.label ?? value ?? "—";
 };

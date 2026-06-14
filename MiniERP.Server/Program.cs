@@ -27,6 +27,8 @@ public class Program {
         builder.Services.AddScoped<OrderService>();
         builder.Services.AddScoped<InvoiceService>();
         builder.Services.AddScoped<CustomerService>();
+        builder.Services.AddScoped<WarehouseService>();
+        builder.Services.AddScoped<ReceiptService>();
         builder.Services.AddCors(options => {
             options.AddPolicy("AllowReact", policy => {
                 policy.WithOrigins("https://localhost:5173", "https://myminierp.runasp.net")
@@ -58,6 +60,8 @@ public class Program {
 
             context.Database.EnsureCreated();
 
+            var orderService = scope.ServiceProvider.GetRequiredService<OrderService>();
+            orderService.SyncWarehouse();
         }
 
         app.UseDefaultFiles();

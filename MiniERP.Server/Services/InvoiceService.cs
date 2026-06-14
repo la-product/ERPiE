@@ -75,7 +75,7 @@ public class InvoiceService {
                     Si = ii.Product.Si,
                     Li = ii.Product.Li,
                     NetPrice = ii.Product.NetPrice,
-                    Stock = ii.Product.Stock
+                    Category = ii.Product.Category
                 }
             }).ToList()
         };

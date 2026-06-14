@@ -74,7 +74,7 @@ public class OrderService {
                     Si = i.Product.Si,
                     Li = i.Product.Li,
                     NetPrice = i.Product.NetPrice,
-                    Stock = i.Product.Stock
+                    Category = i.Product.Category
                 }
             }).ToList()
         };
@@ -99,12 +99,16 @@ public class OrderService {
             });
         }
 
+        order.WarehouseSynced = true;
         _context.Orders.Add(order);
+        _context.SaveChanges();
 
         foreach (var item in order.Items) {
-            var product = _context.Products.Find(item.ProductId);
-            if (product != null) {
-                product.Stock -= item.Quantity;
+            var warehouseItem = _context.WarehouseItems
+                .FirstOrDefault(w => w.ProductId == item.ProductId);
+            if (warehouseItem != null) {
+                warehouseItem.Quantity -= item.Quantity;
+                if (warehouseItem.Quantity < 0) warehouseItem.Quantity = 0;
             }
         }
 
@@ -165,6 +169,28 @@ public class OrderService {
         };
     }
 
+    public void SyncWarehouse() {
+        var unsynced = _context.Orders
+            .Include(o => o.Items)
+            .Where(o => !o.WarehouseSynced)
+            .ToList();
+
+        foreach (var order in unsynced) {
+            foreach (var item in order.Items) {
+                var warehouseItem = _context.WarehouseItems
+                    .FirstOrDefault(w => w.ProductId == item.ProductId);
+                if (warehouseItem != null) {
+                    warehouseItem.Quantity -= item.Quantity;
+                    if (warehouseItem.Quantity < 0) warehouseItem.Quantity = 0;
+                }
+            }
+            order.WarehouseSynced = true;
+        }
+
+        if (unsynced.Count > 0)
+            _context.SaveChanges();
+    }
+
     public bool Delete(int id) {
         var order = _context.Orders
             .Include(o => o.Items)
@@ -173,9 +199,10 @@ public class OrderService {
         if (order == null) return false;
 
         foreach (var item in order.Items) {
-            var product = _context.Products.Find(item.ProductId);
-            if (product != null) {
-                product.Stock += item.Quantity;
+            var warehouseItem = _context.WarehouseItems
+                .FirstOrDefault(w => w.ProductId == item.ProductId);
+            if (warehouseItem != null) {
+                warehouseItem.Quantity += item.Quantity;
             }
         }
 

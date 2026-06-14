@@ -11,12 +11,8 @@ function Receipts({ view, products, setActivePage, user }) {
     const [suppliers, setSuppliers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    // detail modal
     const [showModal, setShowModal] = useState(false);
     const [selectedReceipt, setSelectedReceipt] = useState(null);
-
-    // add form
     const [form, setForm] = useState({
         supplierId: "",
         receiptDate: new Date().toISOString().slice(0, 10),
@@ -140,7 +136,7 @@ function Receipts({ view, products, setActivePage, user }) {
         );
     }
 
-    // ── ADD VIEW ──────────────────────────────────────────────────────────────
+   
     if (view === "add") {
         return (
             <div>
@@ -305,7 +301,6 @@ function Receipts({ view, products, setActivePage, user }) {
         );
     }
 
-    // ── LIST VIEW ─────────────────────────────────────────────────────────────
     return (
         <div>
             {error && <div className="alert alert-danger">{error}</div>}
@@ -408,30 +403,30 @@ function Receipts({ view, products, setActivePage, user }) {
                                     </td>
                                 </tr>
                             ) : (
-                                receipts.map((r) => (
-                                    <tr key={r.id}>
-                                        <td className="fw-bold text-muted">#{r.id}</td>
-                                        <td className="fw-medium">{r.supplierName}</td>
-                                        <td>{new Date(r.receiptDate).toLocaleDateString("cs-CZ")}</td>
+                                receipts.map((rec) => (
+                                    <tr key={rec.id}>
+                                        <td className="fw-bold text-muted">#{rec.id}</td>
+                                        <td className="fw-medium">{rec.supplierName}</td>
+                                        <td>{new Date(rec.receiptDate).toLocaleDateString("cs-CZ")}</td>
                                         <td>
                                             <span className="badge bg-light text-dark border">
-                                                {r.invoiceNumber}
+                                                {rec.invoiceNumber}
                                             </span>
                                         </td>
-                                        <td>{formatPrice(r.totalAmountExVat)}</td>
-                                        <td>{formatPrice(r.vatAmount)}</td>
-                                        <td className="fw-bold">{formatPrice(r.totalAmountIncVat)}</td>
+                                        <td>{formatPrice(rec.totalAmountExVat)}</td>
+                                        <td>{formatPrice(rec.vatAmount)}</td>
+                                        <td className="fw-bold">{formatPrice(rec.totalAmountIncVat)}</td>
                                         <td className="text-end">
                                             <button
                                                 className="btn btn-sm btn-outline-primary me-2"
-                                                onClick={() => handleOpenDetail(r)}
+                                                onClick={() => handleOpenDetail(rec)}
                                             >
                                                 <i className="bi bi-eye"></i>
                                             </button>
                                             {user?.role === "admin" && (
                                                 <button
                                                     className="btn btn-sm btn-outline-danger"
-                                                    onClick={() => handleDelete(r.id)}
+                                                    onClick={() => handleDelete(rec.id)}
                                                 >
                                                     <i className="bi bi-trash"></i>
                                                 </button>

@@ -21,6 +21,13 @@ public class WarehouseService {
                 ProductName = w.Product != null
                     ? $"{w.Product.Brand} {w.Product.Size} {w.Product.Pattern}"
                     : null,
+                ProductSize = w.Product != null ? w.Product.Size : null,
+                ProductBrand = w.Product != null ? w.Product.Brand : null,
+                ProductPattern = w.Product != null ? w.Product.Pattern : null,
+                ProductSi = w.Product != null ? w.Product.Si : 0,
+                ProductLi = w.Product != null ? w.Product.Li : null,
+                ProductNetPrice = w.Product != null ? w.Product.NetPrice : 0,
+                ProductCategory = w.Product != null ? w.Product.Category : null,
                 Quantity = w.Quantity
             }).ToList();
     }
@@ -38,6 +45,13 @@ public class WarehouseService {
             ProductName = item.Product != null
                 ? $"{item.Product.Brand} {item.Product.Size} {item.Product.Pattern}"
                 : null,
+            ProductSize = item.Product?.Size,
+            ProductBrand = item.Product?.Brand,
+            ProductPattern = item.Product?.Pattern,
+            ProductSi = item.Product?.Si ?? 0,
+            ProductLi = item.Product?.Li,
+            ProductNetPrice = item.Product?.NetPrice ?? 0,
+            ProductCategory = item.Product?.Category,
             Quantity = item.Quantity
         };
     }

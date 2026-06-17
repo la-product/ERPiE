@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using MiniERP.Server.Models;
 using MiniERP.Server.DTOs;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authorization;
+using MiniERP.Server.Services;
 
 namespace MiniERP.Server.Controllers;
 
@@ -11,11 +11,11 @@ namespace MiniERP.Server.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase {
     private readonly UserManager<User> _userManager;
-    private readonly SignInManager<User> _signInManager;
+    private readonly JwtService _jwtService;
 
-    public AuthController(UserManager<User> userManager, SignInManager<User> signInManager) {
+    public AuthController(UserManager<User> userManager, JwtService jwtService) {
         _userManager = userManager;
-        _signInManager = signInManager;
+        _jwtService = jwtService;
     }
 
     [HttpPost("login")]
@@ -25,27 +25,17 @@ public class AuthController : ControllerBase {
         if (user == null)
             return Unauthorized(new { message = "Neplatné jméno nebo heslo" });
 
-        var result = await _signInManager.PasswordSignInAsync(
-            request.Username,
-            request.Password,
-            isPersistent: true,  
-            lockoutOnFailure: false
-        );
+        var passwordValid = await _userManager.CheckPasswordAsync(user, request.Password);
 
-        if (!result.Succeeded)
+        if (!passwordValid)
             return Unauthorized(new { message = "Neplatné jméno nebo heslo" });
 
-        var roles = await _userManager.GetRolesAsync(user);
+        var token = _jwtService.GenerateToken(user);
 
-        return Ok(new {
-            username = user.UserName,
-            role = user.Role  
+        return Ok(new LoginResponseDTO {
+            Username = user.UserName ?? string.Empty,
+            Role = user.Role,
+            Token = token,
         });
-    }
-
-    [HttpPost("logout")]
-    public async Task<IActionResult> Logout() {
-        await _signInManager.SignOutAsync();
-        return Ok(new { message = "Odhlášení úspěšné" });
     }
 }

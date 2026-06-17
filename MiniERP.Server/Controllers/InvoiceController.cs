@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using MiniERP.Server.DTOs;
 using MiniERP.Server.Services;
 
@@ -6,6 +7,7 @@ namespace MiniERP.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class InvoiceController : ControllerBase {
     private readonly InvoiceService _service;
 

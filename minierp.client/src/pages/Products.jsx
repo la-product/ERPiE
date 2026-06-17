@@ -203,7 +203,7 @@ function Products({
                             </div>
                             <div className="col-md-6">
                                 <label className="form-label small fw-bold text-uppercase text-muted">
-                                    Cena bez DPH (
+                                    Ceníková cena bez DPH (
                                     {new Intl.NumberFormat("cs-CZ", {
                                         style: "currency",
                                         currency: "CZK",
@@ -340,7 +340,7 @@ function Products({
                                         />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label">Cena bez DPH</label>
+                                        <label className="form-label">Cenníková bez DPH</label>
                                         <input
                                             className="form-control"
                                             value={editForm.netPrice || ""}
@@ -409,7 +409,7 @@ function Products({
                                 <th>Rozměr</th>
                                 <th>Název</th>
                                 <th>SI/LI</th>
-                                <th>Cena bez DPH</th>
+                                <th>Ceníková cena bez DPH</th>
                                 <th>
                                     <div className="d-flex align-items-center">
                                         Kategorie

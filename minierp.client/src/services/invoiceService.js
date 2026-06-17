@@ -2,6 +2,7 @@ import {
   mapFormToCreateInvoiceDto,
   mapFormToUpdateInvoiceDto,
 } from "../mappers/invoiceMapper.js";
+import { authFetch } from "./apiClient.js";
 
 const API_URL = "/api/invoice";
 
@@ -10,7 +11,7 @@ const API_URL = "/api/invoice";
  * @returns {Promise<Array>} Pole InvoiceDTO objektů
  */
 export async function getInvoices() {
-  const res = await fetch(API_URL);
+  const res = await authFetch(API_URL);
   if (!res.ok) throw new Error("Failed to fetch invoices");
   return res.json();
 }
@@ -21,7 +22,7 @@ export async function getInvoices() {
  * @returns {Promise<Object>} InvoiceDetailDTO
  */
 export async function getInvoiceById(id) {
-  const res = await fetch(`${API_URL}/${id}`);
+  const res = await authFetch(`${API_URL}/${id}`);
   if (!res.ok) throw new Error("Failed to fetch invoice");
   return res.json();
 }
@@ -34,7 +35,7 @@ export async function getInvoiceById(id) {
  */
 export async function createInvoice(formData, items) {
   const createDto = mapFormToCreateInvoiceDto(formData, items);
-  const res = await fetch(API_URL, {
+  const res = await authFetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(createDto),
@@ -51,7 +52,7 @@ export async function createInvoice(formData, items) {
  */
 export async function updateInvoice(id, formData) {
   const updateDto = mapFormToUpdateInvoiceDto(formData);
-  const res = await fetch(`${API_URL}/${id}`, {
+  const res = await authFetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(updateDto),
@@ -67,7 +68,7 @@ export async function updateInvoice(id, formData) {
  * @returns {Promise<Object>} Vrácený InvoiceDTO
  */
 export async function updateInvoiceStatus(id, status) {
-  const res = await fetch(`${API_URL}/${id}/status`, {
+  const res = await authFetch(`${API_URL}/${id}/status`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(status),
@@ -82,7 +83,7 @@ export async function updateInvoiceStatus(id, status) {
  * @returns {Promise<void>}
  */
 export async function deleteInvoice(id) {
-  const res = await fetch(`${API_URL}/${id}`, {
+  const res = await authFetch(`${API_URL}/${id}`, {
     method: "DELETE",
   });
   if (!res.ok) throw new Error("Failed to delete invoice");

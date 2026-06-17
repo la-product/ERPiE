@@ -1,4 +1,5 @@
 ﻿import { useState } from 'react';
+import { setToken } from '../services/apiClient';
 
 function Login({ onLogin }) {
     const [username, setUsername] = useState('');
@@ -22,6 +23,7 @@ function Login({ onLogin }) {
 
             if (response.ok) {
                 const data = await response.json();
+                setToken(data.token);
                 onLogin(data);
             } else {
                 const errorData = await response.json();
@@ -39,7 +41,7 @@ function Login({ onLogin }) {
             <div className="card shadow-sm p-4" style={{ maxWidth: '400px', width: '100%', borderRadius: '15px' }}>
                 <div className="text-center mb-4">
                     <div className="d-flex align-items-center justify-content-center mb-2">
-                        <i className="bi bi-box-seam me-2" style={{ fontSize: '32px', color: '#996600' }}></i>
+                        <i className="bi bi-box-seam me-2" style={{ fontSize: '32px', color: '#1f3a5f' }}></i>
                         <h2 className="fw-bold mb-0" style={{ color: '#1a1a1a' }}>ERPiE</h2>
                     </div>
                     <p className="text-muted">Přihlaste se do systému</p>

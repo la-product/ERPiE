@@ -27,6 +27,7 @@ public class WarehouseService {
                 ProductSi = w.Product != null ? w.Product.Si : 0,
                 ProductLi = w.Product != null ? w.Product.Li : null,
                 ProductNetPrice = w.Product != null ? w.Product.NetPrice : 0,
+                UnitPrice = w.UnitPrice,
                 ProductCategory = w.Product != null ? w.Product.Category : null,
                 Quantity = w.Quantity
             }).ToList();
@@ -51,18 +52,20 @@ public class WarehouseService {
             ProductSi = item.Product?.Si ?? 0,
             ProductLi = item.Product?.Li,
             ProductNetPrice = item.Product?.NetPrice ?? 0,
+            UnitPrice = item.UnitPrice,
             ProductCategory = item.Product?.Category,
             Quantity = item.Quantity
         };
     }
 
     public WarehouseItemDTO? Create(CreateWarehouseItemDTO createDto) {
-        var productExists = _context.Products.Any(p => p.Id == createDto.ProductId);
-        if (!productExists) return null;
+        var product = _context.Products.FirstOrDefault(p => p.Id == createDto.ProductId);
+        if (product == null) return null;
 
         var warehouseItem = new WarehouseItem {
             ProductId = createDto.ProductId,
-            Quantity = createDto.Quantity
+            Quantity = createDto.Quantity,
+            UnitPrice = product.NetPrice
         };
 
         _context.WarehouseItems.Add(warehouseItem);

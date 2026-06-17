@@ -74,7 +74,7 @@ function Warehouse({ user }) {
     );
 
     const totalValue = filteredItems.reduce(
-        (sum, item) => sum + item.productNetPrice * item.quantity,
+        (sum, item) => sum + item.unitPrice * item.quantity,
         0,
     );
 
@@ -153,7 +153,7 @@ function Warehouse({ user }) {
                                 <th>Rozměr</th>
                                 <th>Název / Dezén</th>
                                 <th>SI / LI</th>
-                                <th>Kat.</th>
+                                <th>Kategorie</th>
                                 <th className="text-end">Cena bez DPH</th>
                                 <th className="text-center">Počet ks</th>
                                 {user?.role === "admin" && <th className="text-end">Akce</th>}
@@ -172,7 +172,7 @@ function Warehouse({ user }) {
                                     return (
                                         <tr key={item.id}>
                                             <td>
-                                                <span className="fw-bold small font-monospace">
+                                                <span className="fw-bold">
                                                     {item.productSize ?? "—"}
                                                 </span>
                                             </td>
@@ -204,11 +204,11 @@ function Warehouse({ user }) {
                                                 ) : "—"}
                                             </td>
                                             <td className="text-end fw-bold text-dark">
-                                                {formatPrice(item.productNetPrice)}
+                                                {formatPrice(item.unitPrice)}
                                             </td>
                                             <td className="text-center">
                                                 <span
-                                                    className={`badge rounded-pill px-3 py-2 fs-6 ${
+                                                    className={`badge rounded-pill px-3 py-2 fs-7 ${
                                                         item.quantity > 10
                                                             ? "bg-success"
                                                             : item.quantity > 0
@@ -242,7 +242,7 @@ function Warehouse({ user }) {
                         </tbody>
                         {filteredItems.length > 0 && (
                             <tfoot>
-                                <tr style={{ backgroundColor: "#f5f7fa", borderTop: "2px solid #b0bec8" }}>
+                                <tr style={{ backgroundColor: "#f5f7fa", borderTop: "2px solid #c3cbd4" }}>
                                     <td colSpan={4} className="fw-bold text-muted small py-2 ps-3">
                                         Celkem {filteredItems.length} položek
                                     </td>

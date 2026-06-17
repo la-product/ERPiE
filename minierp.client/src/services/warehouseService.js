@@ -1,13 +1,15 @@
+import { authFetch } from "./apiClient.js";
+
 const API_URL = "/api/warehouse";
 
 export async function getWarehouseItems() {
-  const res = await fetch(API_URL);
+  const res = await authFetch(API_URL);
   if (!res.ok) throw new Error("Nepodařilo se načíst sklad");
   return res.json();
 }
 
 export async function addWarehouseItem(productId, quantity) {
-  const res = await fetch(API_URL, {
+  const res = await authFetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ productId, quantity }),
@@ -17,7 +19,7 @@ export async function addWarehouseItem(productId, quantity) {
 }
 
 export async function updateWarehouseItem(id, quantity) {
-  const res = await fetch(`${API_URL}/${id}`, {
+  const res = await authFetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ quantity }),
@@ -27,6 +29,6 @@ export async function updateWarehouseItem(id, quantity) {
 }
 
 export async function deleteWarehouseItem(id) {
-  const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+  const res = await authFetch(`${API_URL}/${id}`, { method: "DELETE" });
   if (!res.ok) throw new Error("Nepodařilo se smazat položku skladu");
 }

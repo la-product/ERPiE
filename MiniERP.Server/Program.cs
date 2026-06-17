@@ -1,7 +1,10 @@
+using System.Text;
 using MiniERP.Server.Models;
 using MiniERP.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using MiniERP.Server.Services;
 
 namespace MiniERP.Server;
@@ -13,16 +16,40 @@ public class Program {
         var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
         var monsterConn = builder.Configuration.GetConnectionString("DefaultConnection").Replace("${DB_PASSWORD}", dbPassword);
         builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(monsterConn, ServerVersion.AutoDetect(monsterConn)));
-        builder.Services.AddIdentity<User, IdentityRole>(options => {
+        builder.Services.AddIdentityCore<User>(options => {
             options.Password.RequireDigit = false;
             options.Password.RequiredLength = 4;
             options.Password.RequireNonAlphanumeric = false;
             options.Password.RequireUppercase = false;
             options.Password.RequireLowercase = false;
         })
+        .AddRoles<IdentityRole>()
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
 
+        var jwtSection = builder.Configuration.GetSection("Jwt");
+        var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET");
+        var jwtKey = jwtSection["Key"]!.Replace("${JWT_SECRET}", jwtSecret);
+        builder.Configuration["Jwt:Key"] = jwtKey;
+
+        builder.Services.AddAuthentication(options => {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options => {
+            options.TokenValidationParameters = new TokenValidationParameters {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSection["Issuer"],
+                ValidAudience = jwtSection["Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            };
+        });
+        builder.Services.AddAuthorization();
+
+        builder.Services.AddScoped<JwtService>();
         builder.Services.AddScoped<ProductService>();
         builder.Services.AddScoped<OrderService>();
         builder.Services.AddScoped<InvoiceService>();
@@ -37,12 +64,6 @@ public class Program {
                 .AllowCredentials();
             });
         });
-        builder.Services.ConfigureApplicationCookie(options => {
-            options.Cookie.Name = "AspNetCore.Identity.Application";
-            options.ExpireTimeSpan = TimeSpan.FromMinutes(60); // Nastaveni casoveho limitu pro cookie, po kterem bude uzivatel odhlasen
-            options.SlidingExpiration = true; // Pokud je uzivatel aktivni, casovy limit se resetuje a cookie bude platna dalsich 2 minuty
-        });
-
         builder.Services.AddControllers()
             .AddJsonOptions(options => {
                 options.JsonSerializerOptions.ReferenceHandler =

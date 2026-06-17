@@ -2,6 +2,7 @@ import {
   mapFormToCreateOrderDto,
   mapFormToUpdateOrderDto,
 } from "../mappers/orderMapper.js";
+import { authFetch } from "./apiClient.js";
 
 const API_URL = "/api/order";
 
@@ -10,7 +11,7 @@ const API_URL = "/api/order";
  * @returns {Promise<Array>} Pole OrderDTO objektů
  */
 export async function getOrders() {
-  const res = await fetch(API_URL);
+  const res = await authFetch(API_URL);
   if (!res.ok) throw new Error("Failed to fetch orders");
   return res.json();
 }
@@ -21,7 +22,7 @@ export async function getOrders() {
  * @returns {Promise<Object>} OrderDetailDTO
  */
 export async function getOrderById(id) {
-  const res = await fetch(`${API_URL}/${id}`);
+  const res = await authFetch(`${API_URL}/${id}`);
   if (!res.ok) throw new Error("Failed to fetch order");
   return res.json();
 }
@@ -34,7 +35,7 @@ export async function getOrderById(id) {
  */
 export async function createOrder(formData, items) {
   const createDto = mapFormToCreateOrderDto(formData, items);
-  const res = await fetch(API_URL, {
+  const res = await authFetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(createDto),
@@ -51,7 +52,7 @@ export async function createOrder(formData, items) {
  */
 export async function updateOrder(id, formData) {
   const updateDto = mapFormToUpdateOrderDto(formData);
-  const res = await fetch(`${API_URL}/${id}`, {
+  const res = await authFetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(updateDto),
@@ -67,7 +68,7 @@ export async function updateOrder(id, formData) {
  * @returns {Promise<Object>} Vrácený OrderDTO
  */
 export async function updateOrderStatus(id, status) {
-  const res = await fetch(`${API_URL}/${id}/status`, {
+  const res = await authFetch(`${API_URL}/${id}/status`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(status),
@@ -82,7 +83,7 @@ export async function updateOrderStatus(id, status) {
  * @returns {Promise<void>}
  */
 export async function deleteOrder(id) {
-  const res = await fetch(`${API_URL}/${id}`, {
+  const res = await authFetch(`${API_URL}/${id}`, {
     method: "DELETE",
   });
   if (!res.ok) throw new Error("Failed to delete order");

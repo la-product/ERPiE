@@ -102,10 +102,12 @@ public class ReceiptService {
 
             if (warehouseItem != null) {
                 warehouseItem.Quantity += item.Quantity;
+                warehouseItem.UnitPrice = item.UnitPriceExVat;
             } else {
                 _context.WarehouseItems.Add(new WarehouseItem {
                     ProductId = item.ProductId,
-                    Quantity = item.Quantity
+                    Quantity = item.Quantity,
+                    UnitPrice = item.UnitPriceExVat
                 });
             }
         }

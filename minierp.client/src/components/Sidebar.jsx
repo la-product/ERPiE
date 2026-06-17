@@ -33,7 +33,7 @@ function Sidebar({ activePage, setActivePage, user }) {
   return (
     <div
       className="bg-white border-end d-flex flex-column"
-      style={{ width: 260, boxShadow: "3px 0 12px rgba(0,0,0,0.15)", borderRight: "2px solid #b0bec8" }}
+      style={{ width: 260, boxShadow: "3px 0 12px rgba(0,0,0,0.15)", borderRight: "2px solid #c3cbd4" }}
     >
       <div className="p-4 border-bottom d-flex align-items-center justify-content-center">
         <i className="bi bi-box-seam me-2" style={{ fontSize: '24px', color: 'var(--primary)' }}></i>

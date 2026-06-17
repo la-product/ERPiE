@@ -1,5 +1,6 @@
     import { useState, useEffect } from 'react';
     import { getProducts } from './services/productService';
+    import { clearToken } from './services/apiClient';
     import Layout from './components/Layout';
     import Customers from './pages/Customers';
     import Products from './pages/Products';
@@ -21,11 +22,15 @@
         };
 
         const handleLogout = () => {
-
-            fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+            clearToken();
             setUser(null);
             setIsAuthenticated(false);
         };
+
+        useEffect(() => {
+            window.addEventListener('unauthorized', handleLogout);
+            return () => window.removeEventListener('unauthorized', handleLogout);
+        }, []);
 
         const [products, setProducts] = useState([]);
         const [productsLoading, setProductsLoading] = useState(true);

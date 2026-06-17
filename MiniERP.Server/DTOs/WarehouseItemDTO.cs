@@ -10,6 +10,7 @@ public class WarehouseItemDTO {
     public int ProductSi { get; set; }
     public string? ProductLi { get; set; }
     public double ProductNetPrice { get; set; }
+    public double UnitPrice { get; set; }
     public string? ProductCategory { get; set; }
     public int Quantity { get; set; }
 }

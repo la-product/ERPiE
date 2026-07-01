@@ -4,4 +4,5 @@
     <Build />
     <Deploy />
   </Project>
+  <Project Path="MiniERP.Tests/MiniERP.Tests.csproj" />
 </Solution>

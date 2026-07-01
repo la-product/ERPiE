@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MiniERP.Server.Data;
 using MiniERP.Server.DTOs;
+using MiniERP.Server.Mappers;
 using MiniERP.Server.Models;
 
 namespace MiniERP.Server.Services;
@@ -16,16 +17,9 @@ public class ReceiptService {
     public List<ReceiptDTO> GetAll() {
         return _context.Receipts
             .Include(r => r.Supplier)
-            .Select(r => new ReceiptDTO {
-                Id = r.Id,
-                SupplierId = r.SupplierId,
-                SupplierName = r.Supplier != null ? r.Supplier.Name : null,
-                ReceiptDate = r.ReceiptDate,
-                InvoiceNumber = r.InvoiceNumber,
-                TotalAmountExVat = r.TotalAmountExVat,
-                VatAmount = r.VatAmount,
-                TotalAmountIncVat = r.TotalAmountIncVat
-            }).ToList();
+            .AsEnumerable()
+            .Select(ReceiptMapper.ToDto)
+            .ToList();
     }
 
     public ReceiptDetailDTO? GetById(int id) {
@@ -35,30 +29,7 @@ public class ReceiptService {
                 .ThenInclude(i => i.Product)
             .FirstOrDefault(r => r.Id == id);
 
-        if (receipt == null) return null;
-
-        return new ReceiptDetailDTO {
-            Id = receipt.Id,
-            SupplierId = receipt.SupplierId,
-            SupplierName = receipt.Supplier?.Name,
-            ReceiptDate = receipt.ReceiptDate,
-            InvoiceNumber = receipt.InvoiceNumber,
-            TotalAmountExVat = receipt.TotalAmountExVat,
-            VatAmount = receipt.VatAmount,
-            TotalAmountIncVat = receipt.TotalAmountIncVat,
-            Items = receipt.Items.Select(i => new ReceiptItemDTO {
-                Id = i.Id,
-                ProductId = i.ProductId,
-                ProductName = i.Product != null
-                    ? $"{i.Product.Brand} {i.Product.Size} {i.Product.Pattern}"
-                    : null,
-                Quantity = i.Quantity,
-                UnitPriceExVat = i.UnitPriceExVat,
-                VatRate = i.VatRate,
-                TotalPriceExVat = i.TotalPriceExVat,
-                TotalPriceIncVat = i.TotalPriceIncVat
-            }).ToList()
-        };
+        return receipt == null ? null : ReceiptMapper.ToDetailDto(receipt);
     }
 
     public ReceiptDTO? Create(CreateReceiptDTO createDto) {
@@ -95,7 +66,6 @@ public class ReceiptService {
 
         _context.Receipts.Add(receipt);
 
-        // naskladnění na sklad
         foreach (var item in receipt.Items) {
             var warehouseItem = _context.WarehouseItems
                 .FirstOrDefault(w => w.ProductId == item.ProductId);
@@ -114,16 +84,8 @@ public class ReceiptService {
 
         _context.SaveChanges();
 
-        return new ReceiptDTO {
-            Id = receipt.Id,
-            SupplierId = receipt.SupplierId,
-            SupplierName = _context.Customers.Find(receipt.SupplierId)?.Name,
-            ReceiptDate = receipt.ReceiptDate,
-            InvoiceNumber = receipt.InvoiceNumber,
-            TotalAmountExVat = receipt.TotalAmountExVat,
-            VatAmount = receipt.VatAmount,
-            TotalAmountIncVat = receipt.TotalAmountIncVat
-        };
+        receipt.Supplier = _context.Customers.Find(receipt.SupplierId);
+        return ReceiptMapper.ToDto(receipt);
     }
 
     public bool Delete(int id) {
@@ -133,7 +95,6 @@ public class ReceiptService {
 
         if (receipt == null) return false;
 
-        // odečtení ze skladu
         foreach (var item in receipt.Items) {
             var warehouseItem = _context.WarehouseItems
                 .FirstOrDefault(w => w.ProductId == item.ProductId);

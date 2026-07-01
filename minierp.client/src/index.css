@@ -245,7 +245,7 @@ p {
         }
 
     .table tbody td {
-        padding: 0.75rem 1rem;
+        padding: 0.2rem 1rem;
         vertical-align: middle;
         border-bottom: 1.5px solid #d0d9e2;
         color: var(--text);

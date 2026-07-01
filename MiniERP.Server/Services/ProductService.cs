@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MiniERP.Server.Data;
 using MiniERP.Server.DTOs;
-using MiniERP.Server.Models;
+using MiniERP.Server.Mappers;
 
 namespace MiniERP.Server.Services;
 
@@ -14,16 +14,8 @@ public class ProductService {
 
     public List<ProductDTO> GetAll() {
         return _context.Products
-            .Select(p => new ProductDTO {
-                Id = p.Id,
-                Size = p.Size,
-                Brand = p.Brand,
-                Pattern = p.Pattern,
-                Si = p.Si,
-                Li = p.Li,
-                NetPrice = p.NetPrice,
-                Category = p.Category
-            }).ToList();
+            .Select(p => ProductMapper.ToDto(p))
+            .ToList();
     }
 
     public ProductDetailDTO? GetById(int id) {
@@ -31,77 +23,23 @@ public class ProductService {
             .Include(p => p.OrderItems)
             .FirstOrDefault(p => p.Id == id);
 
-        if (product == null) return null;
-
-        return new ProductDetailDTO {
-            Id = product.Id,
-            Size = product.Size,
-            Brand = product.Brand,
-            Pattern = product.Pattern,
-            Si = product.Si,
-            Li = product.Li,
-            NetPrice = product.NetPrice,
-            Category = product.Category,
-            OrderItems = product.OrderItems.Select(oi => new OrderItemDTO {
-                Id = oi.Id,
-                OrderId = oi.OrderId,
-                ProductId = oi.ProductId,
-                Quantity = oi.Quantity,
-                UnitPrice = oi.UnitPrice
-            }).ToList()
-        };
+        return product == null ? null : ProductMapper.ToDetailDto(product);
     }
 
     public ProductDTO Create(CreateProductDTO createDto) {
-        var product = new Product {
-            Size = createDto.Size,
-            Brand = createDto.Brand,
-            Pattern = createDto.Pattern,
-            Si = createDto.Si,
-            Li = createDto.Li,
-            NetPrice = createDto.NetPrice,
-            Category = createDto.Category
-        };
-
+        var product = ProductMapper.ToEntity(createDto);
         _context.Products.Add(product);
         _context.SaveChanges();
-
-        return new ProductDTO {
-            Id = product.Id,
-            Size = product.Size,
-            Brand = product.Brand,
-            Pattern = product.Pattern,
-            Si = product.Si,
-            Li = product.Li,
-            NetPrice = product.NetPrice,
-            Category = product.Category
-        };
+        return ProductMapper.ToDto(product);
     }
 
     public ProductDTO? Update(int id, UpdateProductDTO updateDto) {
         var existing = _context.Products.Find(id);
         if (existing == null) return null;
 
-        if (updateDto.Size != null) existing.Size = updateDto.Size;
-        if (updateDto.Brand != null) existing.Brand = updateDto.Brand;
-        if (updateDto.Pattern != null) existing.Pattern = updateDto.Pattern;
-        if (updateDto.Si.HasValue) existing.Si = updateDto.Si.Value;
-        if (updateDto.Li != null) existing.Li = updateDto.Li;
-        if (updateDto.NetPrice.HasValue) existing.NetPrice = updateDto.NetPrice.Value;
-        if (updateDto.Category != null) existing.Category = updateDto.Category;
-
+        ProductMapper.ApplyUpdate(existing, updateDto);
         _context.SaveChanges();
-
-        return new ProductDTO {
-            Id = existing.Id,
-            Size = existing.Size,
-            Brand = existing.Brand,
-            Pattern = existing.Pattern,
-            Si = existing.Si,
-            Li = existing.Li,
-            NetPrice = existing.NetPrice,
-            Category = existing.Category
-        };
+        return ProductMapper.ToDto(existing);
     }
 
     public bool Delete(int id) {

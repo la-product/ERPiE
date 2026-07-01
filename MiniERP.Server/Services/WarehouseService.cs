@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MiniERP.Server.Data;
 using MiniERP.Server.DTOs;
-using MiniERP.Server.Models;
+using MiniERP.Server.Mappers;
 
 namespace MiniERP.Server.Services;
 
@@ -15,22 +15,9 @@ public class WarehouseService {
     public List<WarehouseItemDTO> GetAll() {
         return _context.WarehouseItems
             .Include(w => w.Product)
-            .Select(w => new WarehouseItemDTO {
-                Id = w.Id,
-                ProductId = w.ProductId,
-                ProductName = w.Product != null
-                    ? $"{w.Product.Brand} {w.Product.Size} {w.Product.Pattern}"
-                    : null,
-                ProductSize = w.Product != null ? w.Product.Size : null,
-                ProductBrand = w.Product != null ? w.Product.Brand : null,
-                ProductPattern = w.Product != null ? w.Product.Pattern : null,
-                ProductSi = w.Product != null ? w.Product.Si : 0,
-                ProductLi = w.Product != null ? w.Product.Li : null,
-                ProductNetPrice = w.Product != null ? w.Product.NetPrice : 0,
-                UnitPrice = w.UnitPrice,
-                ProductCategory = w.Product != null ? w.Product.Category : null,
-                Quantity = w.Quantity
-            }).ToList();
+            .AsEnumerable()
+            .Select(WarehouseItemMapper.ToDto)
+            .ToList();
     }
 
     public WarehouseItemDTO? GetById(int id) {
@@ -38,36 +25,14 @@ public class WarehouseService {
             .Include(w => w.Product)
             .FirstOrDefault(w => w.Id == id);
 
-        if (item == null) return null;
-
-        return new WarehouseItemDTO {
-            Id = item.Id,
-            ProductId = item.ProductId,
-            ProductName = item.Product != null
-                ? $"{item.Product.Brand} {item.Product.Size} {item.Product.Pattern}"
-                : null,
-            ProductSize = item.Product?.Size,
-            ProductBrand = item.Product?.Brand,
-            ProductPattern = item.Product?.Pattern,
-            ProductSi = item.Product?.Si ?? 0,
-            ProductLi = item.Product?.Li,
-            ProductNetPrice = item.Product?.NetPrice ?? 0,
-            UnitPrice = item.UnitPrice,
-            ProductCategory = item.Product?.Category,
-            Quantity = item.Quantity
-        };
+        return item == null ? null : WarehouseItemMapper.ToDto(item);
     }
 
     public WarehouseItemDTO? Create(CreateWarehouseItemDTO createDto) {
         var product = _context.Products.FirstOrDefault(p => p.Id == createDto.ProductId);
         if (product == null) return null;
 
-        var warehouseItem = new WarehouseItem {
-            ProductId = createDto.ProductId,
-            Quantity = createDto.Quantity,
-            UnitPrice = product.NetPrice
-        };
-
+        var warehouseItem = WarehouseItemMapper.ToEntity(createDto, product.NetPrice);
         _context.WarehouseItems.Add(warehouseItem);
         _context.SaveChanges();
 
@@ -78,10 +43,8 @@ public class WarehouseService {
         var existing = _context.WarehouseItems.Find(id);
         if (existing == null) return null;
 
-        if (updateDto.Quantity.HasValue) existing.Quantity = updateDto.Quantity.Value;
-
+        WarehouseItemMapper.ApplyUpdate(existing, updateDto);
         _context.SaveChanges();
-
         return GetById(existing.Id);
     }
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getReceipts, getReceiptById, createReceipt, deleteReceipt } from "../services/receiptService";
+import { getReceipts, getReceiptById, createReceipt, deleteReceipt, importInvoice } from "../services/receiptService";
 import { getCustomers } from "../services/customerService";
 import { getProductDisplayText } from "../mappers/productMapper";
 import { formatPrice } from "../utils/formatters";
@@ -20,6 +20,10 @@ function Receipts({ view, products, setActivePage, user }) {
     });
     const [items, setItems] = useState([]);
     const [currentItem, setCurrentItem] = useState({ productId: "", quantity: 1, unitPriceExVat: "" });
+    const [showImportModal, setShowImportModal] = useState(false);
+    const [importLoading, setImportLoading] = useState(false);
+    const [importError, setImportError] = useState(null);
+    const [importPreview, setImportPreview] = useState(null);
 
     const loadData = useCallback(async () => {
         try {
@@ -104,6 +108,68 @@ function Receipts({ view, products, setActivePage, user }) {
         }
     };
 
+    const handleOpenImportModal = () => {
+        setImportPreview(null);
+        setImportError(null);
+        setShowImportModal(true);
+    };
+
+    const handleImportFile = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setImportLoading(true);
+        setImportError(null);
+        setImportPreview(null);
+        try {
+            const result = await importInvoice(file);
+            setImportPreview(result);
+        } catch (err) {
+            setImportError(err.message);
+        } finally {
+            setImportLoading(false);
+            e.target.value = "";
+        }
+    };
+
+    const handleApplyImport = () => {
+        if (!importPreview) return;
+
+        setForm({
+            supplierId: importPreview.supplierId ? String(importPreview.supplierId) : "",
+            receiptDate: importPreview.receiptDate || new Date().toISOString().slice(0, 10),
+            invoiceNumber: importPreview.invoiceNumber || "",
+        });
+
+        const matchedItems = importPreview.items.filter((i) => i.productId);
+        setItems(
+            matchedItems.map((i) => {
+                const product = products.find((p) => p.id === i.productId);
+                const totalExVat = i.unitPriceExVat * i.quantity;
+                return {
+                    productId: i.productId,
+                    productName: product ? getProductDisplayText(product) : i.matchedProductName,
+                    quantity: i.quantity,
+                    unitPriceExVat: i.unitPriceExVat,
+                    totalPriceExVat: totalExVat,
+                    totalPriceIncVat: totalExVat * (1 + VAT_RATE),
+                };
+            })
+        );
+
+        const unmatchedCount = importPreview.items.length - matchedItems.length;
+        setError(
+            !importPreview.supplierId
+                ? "Dodavatele se nepodařilo automaticky přiřadit — vyberte ho ručně."
+                : unmatchedCount > 0
+                ? `${unmatchedCount} položek se nepodařilo přiřadit k produktu — doplňte je ručně.`
+                : null
+        );
+
+        setShowImportModal(false);
+        setImportPreview(null);
+    };
+
     const handleOpenDetail = async (receipt) => {
         try {
             const detail = await getReceiptById(receipt.id);
@@ -142,12 +208,119 @@ function Receipts({ view, products, setActivePage, user }) {
             <div>
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h4 className="fw-bold mb-0">Vytvořit příjemku</h4>
-                    <button className="btn btn-outline-secondary" onClick={() => setActivePage("Seznam příjemek")}>
-                        <i className="bi bi-arrow-left me-2"></i>Zpět na seznam
-                    </button>
+                    <div>
+                        <button className="btn btn-outline-primary me-2" onClick={handleOpenImportModal}>
+                            <i className="bi bi-file-earmark-pdf me-2"></i>Import z PDF faktury
+                        </button>
+                        <button className="btn btn-outline-secondary" onClick={() => setActivePage("Seznam příjemek")}>
+                            <i className="bi bi-arrow-left me-2"></i>Zpět na seznam
+                        </button>
+                    </div>
                 </div>
 
                 {error && <div className="alert alert-danger">{error}</div>}
+
+                {showImportModal && (
+                    <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+                        <div className="modal-dialog modal-lg">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">Import faktury z PDF</h5>
+                                    <button className="btn-close" onClick={() => setShowImportModal(false)} />
+                                </div>
+                                <div className="modal-body">
+                                    {!importPreview && (
+                                        <>
+                                            <p className="text-muted">
+                                                Nahrajte PDF fakturu od dodavatele — dodavatel, datum, číslo faktury
+                                                a položky se pokusí AI automaticky vyplnit.
+                                            </p>
+                                            <input
+                                                type="file"
+                                                accept="application/pdf"
+                                                className="form-control"
+                                                onChange={handleImportFile}
+                                                disabled={importLoading}
+                                            />
+                                        </>
+                                    )}
+
+                                    {importLoading && (
+                                        <div className="d-flex align-items-center gap-2 mt-3 text-muted">
+                                            <div className="spinner-border spinner-border-sm" role="status"></div>
+                                            <span>Čtu fakturu…</span>
+                                        </div>
+                                    )}
+
+                                    {importError && <div className="alert alert-danger mt-3">{importError}</div>}
+
+                                    {importPreview && (
+                                        <div className="mt-2">
+                                            <div className="row mb-3">
+                                                <div className="col-md-4">
+                                                    <div className="text-muted small">Dodavatel</div>
+                                                    <div className="fw-bold">
+                                                        {importPreview.supplierName || "—"}
+                                                        {!importPreview.supplierId && (
+                                                            <span className="badge bg-warning text-dark ms-2">nenalezen</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-4">
+                                                    <div className="text-muted small">Datum příjmu</div>
+                                                    <div className="fw-bold">{importPreview.receiptDate || "—"}</div>
+                                                </div>
+                                                <div className="col-md-4">
+                                                    <div className="text-muted small">Číslo faktury</div>
+                                                    <div className="fw-bold">{importPreview.invoiceNumber || "—"}</div>
+                                                </div>
+                                            </div>
+                                            <table className="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Položka na faktuře</th>
+                                                        <th>Přiřazený produkt</th>
+                                                        <th>Množství</th>
+                                                        <th>Cena bez DPH</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {importPreview.items.map((item, idx) => (
+                                                        <tr key={idx}>
+                                                            <td>{item.extractedProductName}</td>
+                                                            <td>
+                                                                {item.productId ? (
+                                                                    item.matchedProductName
+                                                                ) : (
+                                                                    <span className="badge bg-warning text-dark">nenalezen</span>
+                                                                )}
+                                                            </td>
+                                                            <td>{item.quantity} ks</td>
+                                                            <td>{formatPrice(item.unitPriceExVat)}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                            <p className="text-muted small mb-0">
+                                                Nenalezené položky bude potřeba doplnit ručně po použití náhledu.
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="modal-footer">
+                                    <button className="btn btn-secondary" onClick={() => setShowImportModal(false)}>
+                                        Zrušit
+                                    </button>
+                                    {importPreview && (
+                                        <button className="btn btn-primary" onClick={handleApplyImport}>
+                                            <i className="bi bi-check-lg me-2"></i>Použít v příjemce
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Hlavička příjemky */}
                 <div className="card border-0 shadow-sm mb-4">

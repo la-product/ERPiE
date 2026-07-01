@@ -28,3 +28,18 @@ export async function deleteReceipt(id) {
     const res = await authFetch(`${API_URL}/${id}`, { method: "DELETE" });
     if (!res.ok) throw new Error("Nepodařilo se smazat příjemku");
 }
+
+export async function importInvoice(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await authFetch(`${API_URL}/import-invoice`, {
+        method: "POST",
+        body: formData,
+    });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Nepodařilo se zpracovat fakturu.");
+    }
+    return res.json();
+}

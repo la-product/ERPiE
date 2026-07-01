@@ -56,6 +56,7 @@ public class Program {
         builder.Services.AddScoped<CustomerService>();
         builder.Services.AddScoped<WarehouseService>();
         builder.Services.AddScoped<ReceiptService>();
+        builder.Services.AddScoped<InvoiceImportService>();
         builder.Services.AddCors(options => {
             options.AddPolicy("AllowReact", policy => {
                 policy.WithOrigins("https://localhost:5173", "https://myminierp.runasp.net")

@@ -47,6 +47,10 @@ Projekt je aktivně vyvíjen jako miniERP systém pro prodejce pneumatik.
 - [x] Po uložení příjemky se produkty **automaticky naskladní** (přičtou se k zásobám)
 - [x] Smazání příjemky odečte naskladněné množství zpět
 - [x] Detail příjemky s rozpisem položek
+- [x] **Import faktury z PDF (AI)** — nahrání PDF faktury od dodavatele, ze kterého AI model
+  (Google Gemini) automaticky přečte dodavatele, datum, číslo faktury a položky. Přečtená data
+  se spárují s existujícími dodavateli a produkty v databázi a po potvrzení předvyplní formulář
+  příjemky. Nenalezené položky je potřeba doplnit ručně.
 
 ### Dodací listy
 - [x] Vytvoření dodacího listu (výběr zákazníka, produktů, dopravy a platby)
@@ -116,6 +120,9 @@ MiniERP/
 - .NET 10 SDK
 - Node.js
 - MySQL server
+- (volitelné) API klíč pro Google Gemini — pro funkci "Import faktury z PDF" u příjemek,
+  zdarma na [aistudio.google.com/apikey](https://aistudio.google.com/apikey), nastavený jako
+  proměnná prostředí `GOOGLE_API_KEY`
 
 ### Backend
 
@@ -154,5 +161,6 @@ Frontend běží na `http://localhost:5173`.
 | PUT/DELETE | `/api/warehouse/{id}` | Úprava / odebrání položky skladu |
 | GET/POST | `/api/receipt` | Seznam / vytvoření příjemky |
 | DELETE | `/api/receipt/{id}` | Smazání příjemky |
+| POST | `/api/receipt/import-invoice` | Import PDF faktury přes AI — vrací extrahovaná a spárovaná data pro předvyplnění příjemky |
 
 

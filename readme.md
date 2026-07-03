@@ -2,7 +2,7 @@
 ## Osobní školní projekt
 Webová ERP aplikace určená pro **prodejce pneumatik**. Umožňuje správu adresáře firem, produktového katalogu pneumatik, skladových pohybů, dodacích listů, faktur a příjemek zboží.
 ### Stav projektu
-Projekt je aktivně vyvíjen jako miniERP systém pro prodejce pneumatik.
+Projekt je aktivně vyvíjen jako mini ERP skladový systém pro prodejce pneumatik.
 
 ## Technologie
 

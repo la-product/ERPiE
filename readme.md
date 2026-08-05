@@ -1,8 +1,7 @@
 # ERPiE
 ## Osobní školní projekt
 Webová skladová aplikace určená pro **prodejce pneumatik**. Umožňuje správu adresáře firem, produktového katalogu pneumatik, skladových pohybů, dodacích listů, faktur a příjemek zboží.
-### Stav projektu
-Projekt je aktivně vyvíjen jako mini ERP skladový systém pro prodejce pneumatik.
+
 
 ## Technologie
 

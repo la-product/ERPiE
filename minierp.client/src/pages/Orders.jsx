@@ -4,6 +4,7 @@ import { getOrders, createOrder, updateOrderStatus, deleteOrder, getOrderById } 
 import { getProductDisplayText } from "../mappers/productMapper";
 import InvoiceForm from "./InvoiceForm";
 import { formatPrice } from "../utils/formatters";
+import ConfirmModal from "../components/ConfirmModal";
 
 function Orders({ view, products, setActivePage, user }) {
     const [customers, setCustomers] = useState([]);
@@ -27,6 +28,7 @@ function Orders({ view, products, setActivePage, user }) {
     });
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [deleteTargetId, setDeleteTargetId] = useState(null);
 
     const getStatusBadgeClass = (status) => {
         switch (status?.toLowerCase()) {
@@ -154,15 +156,19 @@ function Orders({ view, products, setActivePage, user }) {
         }
     };
 
-    const handleDeleteOrder = async (id) => {
-        if (window.confirm('Opravdu chcete smazat tuto objednávku?')) {
-            try {
-                await deleteOrder(id);
-                await loadData();
-                setError(null);
-            } catch (err) {
-                setError(err.message);
-            }
+    const handleDeleteOrder = (id) => {
+        setDeleteTargetId(id);
+    };
+
+    const handleConfirmDelete = async () => {
+        const id = deleteTargetId;
+        setDeleteTargetId(null);
+        try {
+            await deleteOrder(id);
+            await loadData();
+            setError(null);
+        } catch (err) {
+            setError(err.message);
         }
     };
 
@@ -509,6 +515,13 @@ function Orders({ view, products, setActivePage, user }) {
                 selectedOrder={selectedOrder}
                 onClose={handleCloseInvoiceForm}
                 onSuccess={handleInvoiceSuccess}
+            />
+            <ConfirmModal
+                show={deleteTargetId !== null}
+                title="Smazat dodací list"
+                message="Opravdu chcete smazat tuto objednávku?"
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setDeleteTargetId(null)}
             />
         </div>
     );

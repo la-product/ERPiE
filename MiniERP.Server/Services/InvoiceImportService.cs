@@ -11,9 +11,6 @@ namespace MiniERP.Server.Services;
 /// <summary>
 /// Čte PDF faktury přes Google Gemini API a extrahovaná data spáruje s existujícími
 /// dodavateli a produkty, aby šla předvyplnit do formuláře příjemky.
-/// Vyžaduje proměnnou prostředí GOOGLE_API_KEY (zdarma klíč z https://aistudio.google.com/apikey).
-/// Pozor: balíček Google.GenAI 1.12.0 čte při použití bezparametrického Client() jen
-/// GOOGLE_API_KEY, i když dokumentace zmiňuje i GEMINI_API_KEY jako alternativu.
 /// </summary>
 public class InvoiceImportService {
     private readonly AppDbContext _context;

@@ -6,13 +6,19 @@
 export const mapInvoiceDtoToForm = (invoiceDto) => {
     return {
         id: invoiceDto.id || "",
+        invoiceNumber: invoiceDto.invoiceNumber || "",
         issueDate: invoiceDto.issueDate || "",
+        taxableSupplyDate: invoiceDto.taxableSupplyDate || "",
         dueDate: invoiceDto.dueDate || "",
+        supplierId: invoiceDto.supplierId || "",
         customerId: invoiceDto.customerId || "",
         totalAmountExVat: invoiceDto.totalAmountExVat || "",
         vatAmount: invoiceDto.vatAmount || "",
         totalAmountIncVat: invoiceDto.totalAmountIncVat || "",
         currencyCode: invoiceDto.currencyCode || "",
+        bankAccount: invoiceDto.bankAccount || "",
+        variableSymbol: invoiceDto.variableSymbol || "",
+        paymentMethod: invoiceDto.paymentMethod || "",
         status: invoiceDto.status || "",
     };
 };
@@ -26,15 +32,19 @@ export const mapInvoiceDtoToForm = (invoiceDto) => {
 export const mapFormToCreateInvoiceDto = (formData, items) => {
     return {
         issueDate: formData.issueDate,
+        taxableSupplyDate: formData.taxableSupplyDate,
         dueDate: formData.dueDate,
+        supplierId: parseInt(formData.supplierId),
         customerId: parseInt(formData.customerId),
         totalAmountExVat: parseFloat(formData.totalAmountExVat) || 0,
         vatAmount: parseFloat(formData.vatAmount) || 0,
         totalAmountIncVat: parseFloat(formData.totalAmountIncVat) || 0,
         currencyCode: formData.currencyCode || "Kč",
+        bankAccount: formData.bankAccount,
+        variableSymbol: formData.variableSymbol,
+        paymentMethod: formData.paymentMethod,
         status: formData.status || "",
         items: items.map((item) => ({
-            productId: item.productId,
             description: item.description,
             quantity: parseInt(item.quantity) || 1,
             unitPrice: parseFloat(item.unitPrice) || 0,
@@ -52,7 +62,9 @@ export const mapFormToCreateInvoiceDto = (formData, items) => {
 export const mapFormToUpdateInvoiceDto = (formData) => {
     const dto = {};
 
+    if (formData.invoiceNumber) dto.invoiceNumber = formData.invoiceNumber;
     if (formData.issueDate) dto.issueDate = formData.issueDate;
+    if (formData.taxableSupplyDate) dto.taxableSupplyDate = formData.taxableSupplyDate;
     if (formData.dueDate) dto.dueDate = formData.dueDate;
     if (formData.status) dto.status = formData.status;
     if (formData.totalAmountExVat)
@@ -61,6 +73,9 @@ export const mapFormToUpdateInvoiceDto = (formData) => {
     if (formData.totalAmountIncVat)
         dto.totalAmountIncVat = parseFloat(formData.totalAmountIncVat);
     if (formData.currencyCode) dto.currencyCode = formData.currencyCode;
+    if (formData.bankAccount) dto.bankAccount = formData.bankAccount;
+    if (formData.variableSymbol) dto.variableSymbol = formData.variableSymbol;
+    if (formData.paymentMethod) dto.paymentMethod = formData.paymentMethod;
 
     return dto;
 };
@@ -72,7 +87,6 @@ export const mapFormToUpdateInvoiceDto = (formData) => {
  */
 export const mapFormItemToInvoiceItemDto = (item) => {
     return {
-        productId: item.productId,
         description: item.description,
         quantity: parseInt(item.quantity) || 1,
         unitPrice: parseFloat(item.unitPrice) || 0,

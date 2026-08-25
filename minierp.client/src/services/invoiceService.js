@@ -28,6 +28,17 @@ export async function getInvoiceById(id) {
 }
 
 /**
+ * Načte číslo faktury, které bude přiděleno další vytvořené faktuře
+ * @returns {Promise<string>} Číslo faktury (formát RRRRXXX)
+ */
+export async function getNextInvoiceNumber() {
+  const res = await authFetch(`${API_URL}/next-number`);
+  if (!res.ok) throw new Error("Failed to fetch next invoice number");
+  const data = await res.json();
+  return data.invoiceNumber;
+}
+
+/**
  * Vytvoří novou fakturu
  * @param {Object} formData - Data z formuláře
  * @param {Array} items - Pole InvoiceItemDTO

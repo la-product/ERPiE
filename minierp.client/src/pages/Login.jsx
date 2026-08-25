@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react';
-import { setToken } from '../services/apiClient';
+import { setToken, setStoredUser } from '../services/apiClient';
 
 function Login({ onLogin }) {
     const [username, setUsername] = useState('');
@@ -24,6 +24,7 @@ function Login({ onLogin }) {
             if (response.ok) {
                 const data = await response.json();
                 setToken(data.token);
+                setStoredUser(data);
                 onLogin(data);
             } else {
                 const errorData = await response.json();

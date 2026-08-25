@@ -4,10 +4,12 @@ import {
     addCustomer,
     updateCustomer,
     deleteCustomer,
+    getCompanyFromAres,
 } from "../services/customerService";
 import {
     mapCustomerDtoToForm
 } from "../mappers/customerMapper";
+import ConfirmModal from "../components/ConfirmModal";
 
 function Customers({ view, setActivePage, user }) {
     const [customers, setCustomers] = useState([]);
@@ -19,13 +21,19 @@ function Customers({ view, setActivePage, user }) {
         zip: "",
         phone: "",
         ico: "",
+        dic: "",
+        accountNumber: "",
+        bankCode: "",
         isSupplier: false,
+        note: "",
     });
     const [showModal, setShowModal] = useState(false);
     const [editForm, setEditForm] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [filterText, setFilterText] = useState("");
+    const [aresLoading, setAresLoading] = useState(false);
+    const [deleteTargetId, setDeleteTargetId] = useState(null);
 
     const loadCustomers = useCallback(async () => {
         try {
@@ -61,19 +69,50 @@ function Customers({ view, setActivePage, user }) {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm("Opravdu chcete smazat tohoto zákazníka?")) {
-            try {
-                await deleteCustomer(id);
-                setCustomers((prev) => prev.filter((c) => c.id !== id));
-                setError(null);
-            } catch (err) {
-                setError(err.message);
-            }
+    const handleDelete = (id) => {
+        setDeleteTargetId(id);
+    };
+
+    const handleConfirmDelete = async () => {
+        const id = deleteTargetId;
+        setDeleteTargetId(null);
+        try {
+            await deleteCustomer(id);
+            setCustomers((prev) => prev.filter((c) => c.id !== id));
+            setError(null);
+        } catch (err) {
+            setError(err.message);
         }
     };
 
     const validateIco = (ico) => /^\d{8}$/.test(ico);
+
+    const handleLoadFromAres = async () => {
+        if (!validateIco(form.ico)) {
+            setError("Pro načtení z ARESu zadejte platné IČO (8 číslic).");
+            return;
+        }
+
+        setAresLoading(true);
+        try {
+            const company = await getCompanyFromAres(form.ico);
+            setForm((prev) => ({
+                ...prev,
+                name: company.name || prev.name,
+                street: company.street || prev.street,
+                city: company.city || prev.city,
+                zip: company.zip || prev.zip,
+                dic: company.dic || prev.dic,
+                accountNumber: company.accountNumber || prev.accountNumber,
+                backCode: company.backCode || prev.backCode
+            }));
+            setError(null);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setAresLoading(false);
+        }
+    };
 
     const handleSubmit = async () => {
         if (form.ico && !validateIco(form.ico)) {
@@ -91,7 +130,11 @@ function Customers({ view, setActivePage, user }) {
                 zip: "",
                 phone: "",
                 ico: "",
+                dic: "",
+                accountNumber: "",
+                backCode: "",
                 isSupplier: false,
+                note: "",
             });
             setError(null);
         } catch (err) {
@@ -169,10 +212,52 @@ function Customers({ view, setActivePage, user }) {
                                         value={form.ico}
                                         onChange={(e) => setForm({ ...form, ico: e.target.value.replace(/\D/g, "") })}
                                     />
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-primary"
+                                        onClick={handleLoadFromAres}
+                                        disabled={aresLoading || !validateIco(form.ico)}
+                                        title="Načíst údaje z ARESu"
+                                    >
+                                        {aresLoading ? (
+                                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                        ) : (
+                                            <>
+                                                <i className="bi bi-cloud-download me-1"></i>ARES
+                                            </>
+                                        )}
+                                    </button>
                                     {form.ico && !validateIco(form.ico) && (
                                         <div className="invalid-feedback">IČO musí mít přesně 8 číslic.</div>
                                     )}
                                 </div>
+                            </div>
+                            <div className="col-md-4">
+                                <label className="form-label small fw-bold text-uppercase text-muted">DIČ</label>
+                                <input
+                                    className="form-control"
+                                    placeholder="CZ12345678"
+                                    value={form.dic}
+                                    onChange={(e) => setForm({ ...form, dic: e.target.value })}
+                                />
+                            </div>
+                            <div className="col-md-4">
+                                <label className="form-label small fw-bold text-uppercase text-muted">Číslo účtu</label>
+                                <input
+                                    className="form-control"
+                                    placeholder="12345678"
+                                    value={form.accountNumber}
+                                    onChange={(e) => setForm({ ...form, accountNumber: e.target.value })}
+                                />
+                            </div>
+                            <div className="col-md-4">
+                                <label className="form-label small fw-bold text-uppercase text-muted">Kód Banky</label>
+                                <input
+                                    className="form-control"
+                                    placeholder="0100"
+                                    value={form.bankCode}
+                                    onChange={(e) => setForm({ ...form, bankCode: e.target.value })}
+                                />
                             </div>
                             <div className="col-md-2 d-flex align-items-end pb-1">
                                 <div className="form-check form-switch">
@@ -216,6 +301,16 @@ function Customers({ view, setActivePage, user }) {
                                     onChange={(e) => setForm({ ...form, city: e.target.value })}
                                 />
                             </div>
+                            <div className="col-12">
+                                <label className="form-label small fw-bold text-uppercase text-muted">Poznámka</label>
+                                <textarea
+                                    className="form-control"
+                                    rows={3}
+                                    placeholder="Interní poznámka k zákazníkovi"
+                                    value={form.note}
+                                    onChange={(e) => setForm({ ...form, note: e.target.value })}
+                                />
+                            </div>
                         </div>
                         <div className="mt-4 pt-3 border-top">
                             <button className="btn btn-primary btn-lg w-100 fw-bold" onClick={handleSubmit}>
@@ -241,6 +336,13 @@ function Customers({ view, setActivePage, user }) {
     return (
         <div>
             {error && <div className="alert alert-danger">{error}</div>}
+            <ConfirmModal
+                show={deleteTargetId !== null}
+                title="Smazat zákazníka"
+                message="Opravdu chcete smazat tohoto zákazníka?"
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setDeleteTargetId(null)}
+            />
             {showModal && (
                 <div
                     className="modal show d-block"
@@ -298,6 +400,36 @@ function Customers({ view, setActivePage, user }) {
                                         />
                                     </div>
                                     <div className="col-md-6">
+                                        <label className="form-label fw-bold">DIČ</label>
+                                        <input
+                                            className="form-control"
+                                            value={editForm.dic || ""}
+                                            onChange={(e) =>
+                                                setEditForm({ ...editForm, dic: e.target.value })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-bold">Číslo účtu</label>
+                                        <input
+                                            className="form-control"
+                                            value={editForm.accountNumber || ""}
+                                            onChange={(e) =>
+                                                setEditForm({ ...editForm, accountNumber: e.target.value })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-bold">Kód banky</label>
+                                        <input
+                                            className="form-control"
+                                            value={editForm.bankCode || ""}
+                                            onChange={(e) =>
+                                                setEditForm({ ...editForm, bankCode: e.target.value })
+                                            }
+                                        />
+                                    </div>
+                                    <div className="col-md-6">
                                         <label className="form-label fw-bold">Ulice</label>
                                         <input
                                             className="form-control"
@@ -340,6 +472,17 @@ function Customers({ view, setActivePage, user }) {
                                             />
                                             <label className="form-check-label" htmlFor="editIsSupplier">Dodavatel</label>
                                         </div>
+                                    </div>
+                                    <div className="col-12">
+                                        <label className="form-label fw-bold">Poznámka</label>
+                                        <textarea
+                                            className="form-control"
+                                            rows={3}
+                                            value={editForm.note || ""}
+                                            onChange={(e) =>
+                                                setEditForm({ ...editForm, note: e.target.value })
+                                            }
+                                        />
                                     </div>
                                 </div>
                             </div>

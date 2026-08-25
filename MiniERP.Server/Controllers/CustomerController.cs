@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using MiniERP.Server.DTOs;
 using MiniERP.Server.Services;
@@ -10,14 +11,30 @@ namespace MiniERP.Server.Controllers;
 [Authorize]
 public class CustomerController : ControllerBase {
     private readonly CustomerService _service;
+    private readonly AresService _aresService;
 
-    public CustomerController(CustomerService service) {
+    public CustomerController(CustomerService service, AresService aresService) {
         _service = service;
+        _aresService = aresService;
     }
 
     [HttpGet]
     public IActionResult Get() {
         return Ok(_service.GetAll());
+    }
+
+    [HttpGet("ares/{ico}")]
+    public async Task<IActionResult> GetFromAres(string ico) {
+        if (!Regex.IsMatch(ico, @"^\d{8}$")) {
+            return BadRequest(new { message = "IČO musí mít přesně 8 číslic." });
+        }
+
+        var company = await _aresService.GetByIcoAsync(ico);
+        if (company == null) {
+            return NotFound(new { message = "Subjekt s tímto IČO nebyl v ARESu nalezen." });
+        }
+
+        return Ok(company);
     }
 
     [HttpGet("{id}")]

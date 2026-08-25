@@ -3,6 +3,7 @@ import { getReceipts, getReceiptById, createReceipt, deleteReceipt, importInvoic
 import { getCustomers } from "../services/customerService";
 import { getProductDisplayText } from "../mappers/productMapper";
 import { formatPrice } from "../utils/formatters";
+import ConfirmModal from "../components/ConfirmModal";
 
 const VAT_RATE = 0.21;
 
@@ -24,6 +25,7 @@ function Receipts({ view, products, setActivePage, user }) {
     const [importLoading, setImportLoading] = useState(false);
     const [importError, setImportError] = useState(null);
     const [importPreview, setImportPreview] = useState(null);
+    const [deleteTargetId, setDeleteTargetId] = useState(null);
 
     const loadData = useCallback(async () => {
         try {
@@ -180,15 +182,19 @@ function Receipts({ view, products, setActivePage, user }) {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm("Opravdu chcete smazat tuto příjemku? Množství bude odečteno ze skladu.")) {
-            try {
-                await deleteReceipt(id);
-                setReceipts((prev) => prev.filter((r) => r.id !== id));
-                setError(null);
-            } catch (err) {
-                setError(err.message);
-            }
+    const handleDelete = (id) => {
+        setDeleteTargetId(id);
+    };
+
+    const handleConfirmDelete = async () => {
+        const id = deleteTargetId;
+        setDeleteTargetId(null);
+        try {
+            await deleteReceipt(id);
+            setReceipts((prev) => prev.filter((r) => r.id !== id));
+            setError(null);
+        } catch (err) {
+            setError(err.message);
         }
     };
 
@@ -612,6 +618,13 @@ function Receipts({ view, products, setActivePage, user }) {
                     </table>
                 </div>
             </div>
+            <ConfirmModal
+                show={deleteTargetId !== null}
+                title="Smazat příjemku"
+                message="Opravdu chcete smazat tuto příjemku? Množství bude odečteno ze skladu."
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setDeleteTargetId(null)}
+            />
         </div>
     );
 }

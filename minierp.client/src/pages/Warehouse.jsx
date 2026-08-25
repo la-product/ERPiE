@@ -5,6 +5,7 @@ import {
     deleteWarehouseItem,
 } from "../services/warehouseService";
 import { formatPrice } from "../utils/formatters";
+import ConfirmModal from "../components/ConfirmModal";
 
 const CATEGORY_BADGE = {
     zimni:     { style: { backgroundColor: "#2563eb" }, icon: "bi-snow",     title: "Zimní" },
@@ -20,6 +21,7 @@ function Warehouse({ user }) {
     const [editItem, setEditItem] = useState(null);
     const [editQuantity, setEditQuantity] = useState("");
     const [filterText, setFilterText] = useState("");
+    const [deleteTargetId, setDeleteTargetId] = useState(null);
 
     const loadItems = useCallback(async () => {
         try {
@@ -54,15 +56,19 @@ function Warehouse({ user }) {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm("Opravdu chcete odebrat tuto položku ze skladu?")) {
-            try {
-                await deleteWarehouseItem(id);
-                setItems((prev) => prev.filter((i) => i.id !== id));
-                setError(null);
-            } catch (err) {
-                setError(err.message);
-            }
+    const handleDelete = (id) => {
+        setDeleteTargetId(id);
+    };
+
+    const handleConfirmDelete = async () => {
+        const id = deleteTargetId;
+        setDeleteTargetId(null);
+        try {
+            await deleteWarehouseItem(id);
+            setItems((prev) => prev.filter((i) => i.id !== id));
+            setError(null);
+        } catch (err) {
+            setError(err.message);
         }
     };
 
@@ -258,6 +264,13 @@ function Warehouse({ user }) {
                     </table>
                 </div>
             </div>
+            <ConfirmModal
+                show={deleteTargetId !== null}
+                title="Odebrat položku"
+                message="Opravdu chcete odebrat tuto položku ze skladu?"
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setDeleteTargetId(null)}
+            />
         </div>
     );
 }

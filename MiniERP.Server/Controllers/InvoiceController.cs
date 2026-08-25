@@ -20,6 +20,11 @@ public class InvoiceController : ControllerBase {
         return Ok(_service.GetAll());
     }
 
+    [HttpGet("next-number")]
+    public IActionResult GetNextNumber() {
+        return Ok(new { invoiceNumber = _service.PreviewNextInvoiceNumber() });
+    }
+
     [HttpGet("{id}")]
     public IActionResult GetById(int id) {
         var dto = _service.GetById(id);

@@ -71,3 +71,17 @@ export async function deleteCustomer(id) {
   });
   if (!res.ok) throw new Error("Failed to delete customer");
 }
+
+/**
+ * Načte údaje o firmě z ARESu podle IČO
+ * @param {string} ico - IČO (8 číslic)
+ * @returns {Promise<Object>} AresCompanyDTO (name, street, city, zip, ico, dic)
+ */
+export async function getCompanyFromAres(ico) {
+  const res = await authFetch(`${API_URL}/ares/${ico}`);
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.message || "Nepodařilo se načíst data z ARESu.");
+  }
+  return res.json();
+}

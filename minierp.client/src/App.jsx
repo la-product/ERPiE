@@ -1,6 +1,6 @@
     import { useState, useEffect } from 'react';
     import { getProducts } from './services/productService';
-    import { clearToken } from './services/apiClient';
+    import { clearToken, restoreSession } from './services/apiClient';
     import Layout from './components/Layout';
     import Customers from './pages/Customers';
     import Products from './pages/Products';
@@ -12,8 +12,8 @@
     import Receipts from './pages/Receipts';
 
     function App() {
-        const [isAuthenticated, setIsAuthenticated] = useState(false);
-        const [user, setUser] = useState(null);
+        const [user, setUser] = useState(() => restoreSession());
+        const [isAuthenticated, setIsAuthenticated] = useState(() => restoreSession() !== null);
         const [activePage, setActivePage] = useState('Customer list');
 
         const handleLogin = (userData) => {

@@ -12,6 +12,7 @@ import {
     getCategoryLabel,
 } from "../mappers/productMapper";
 import { formatPrice } from "../utils/formatters";
+import ConfirmModal from "../components/ConfirmModal";
 
 const CATEGORY_BADGE = {
     zimni:     { style: { backgroundColor: "#2563eb" },         icon: "bi-snow",     title: "Zimní" },
@@ -42,6 +43,7 @@ function Products({
     const [error, setError] = useState(null);
     const [filterText, setFilterText] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("");
+    const [deleteTargetId, setDeleteTargetId] = useState(null);
 
     const loadProducts = useCallback(async () => {
         try {
@@ -80,15 +82,19 @@ function Products({
         }
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm("Opravdu chcete smazat tento produkt?")) {
-            try {
-                await deleteProduct(id);
-                setProducts((prev) => prev.filter((p) => p.id !== id));
-                setError(null);
-            } catch (err) {
-                setError(err.message);
-            }
+    const handleDelete = (id) => {
+        setDeleteTargetId(id);
+    };
+
+    const handleConfirmDelete = async () => {
+        const id = deleteTargetId;
+        setDeleteTargetId(null);
+        try {
+            await deleteProduct(id);
+            setProducts((prev) => prev.filter((p) => p.id !== id));
+            setError(null);
+        } catch (err) {
+            setError(err.message);
         }
     };
 
@@ -273,6 +279,13 @@ function Products({
     return (
         <div>
             {error && <div className="alert alert-danger">{error}</div>}
+            <ConfirmModal
+                show={deleteTargetId !== null}
+                title="Smazat produkt"
+                message="Opravdu chcete smazat tento produkt?"
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setDeleteTargetId(null)}
+            />
             {showModal && (
                 <div
                     className="modal show d-block"

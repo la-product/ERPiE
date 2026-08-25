@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MiniERP.Server.Data;
 
@@ -11,9 +12,11 @@ using MiniERP.Server.Data;
 namespace MiniERP.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260818092634_AddInvoiceRequiredFields")]
+    partial class AddInvoiceRequiredFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -162,14 +165,6 @@ namespace MiniERP.Server.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AccountNumber")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("BankCode")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -190,10 +185,6 @@ namespace MiniERP.Server.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Note")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -277,8 +268,6 @@ namespace MiniERP.Server.Migrations
                     b.HasIndex("InvoiceNumber")
                         .IsUnique();
 
-                    b.HasIndex("SupplierId");
-
                     b.ToTable("Invoices");
                 });
 
@@ -297,7 +286,7 @@ namespace MiniERP.Server.Migrations
                     b.Property<int>("InvoiceId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProductId")
+                    b.Property<int>("ProductId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
@@ -646,15 +635,7 @@ namespace MiniERP.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MiniERP.Server.Models.Customer", "Supplier")
-                        .WithMany()
-                        .HasForeignKey("SupplierId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Customer");
-
-                    b.Navigation("Supplier");
                 });
 
             modelBuilder.Entity("MiniERP.Server.Models.InvoiceItem", b =>
@@ -668,7 +649,8 @@ namespace MiniERP.Server.Migrations
                     b.HasOne("MiniERP.Server.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Invoice");
 

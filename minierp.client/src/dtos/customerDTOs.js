@@ -8,7 +8,11 @@
  * @property {string} email
  * @property {string} phone
  * @property {string} ico
+ * @property {string} dic
+ * @property {string} accountNumber
+ * @property {string} bankCode
  * @property {boolean} isSupplier
+ * @property {string} note
  */
 
 /**
@@ -20,7 +24,11 @@
  * @property {string} email
  * @property {string} phone
  * @property {string} ico
+ * @property {string} dic
+ * @property {string} accountNumber
+ * @property {string} bankCode
  * @property {boolean} isSupplier
+ * @property {string} note
  */
 
 /**
@@ -32,7 +40,11 @@
  * @property {string} [email]
  * @property {string} [phone]
  * @property {string} [ico]
+ * @property {string} [dic]
+ * @property {string} [accountNumber]
+ * @property {string} [bankCode]
  * @property {boolean} [isSupplier]
+ * @property {string} [note]
  */
 
 /**
@@ -45,7 +57,11 @@
  * @property {string} email
  * @property {string} phone
  * @property {string} ico
+ * @property {string} dic
  * @property {boolean} isSupplier
+ * @property {string} accountNumber
+ * @property {string} bankCode
+ * @property {string} note
  * @property {Array} orders
  */
 

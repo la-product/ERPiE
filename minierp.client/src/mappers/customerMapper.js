@@ -8,7 +8,11 @@ export const mapCustomerDtoToForm = (customerDto) => {
         zip: customerDto.zip || "",
         phone: customerDto.phone || "",
         ico: customerDto.ico || "",           
-        isSupplier: customerDto.isSupplier ?? false, 
+        dic: customerDto.dic || "",
+        accountNumber: customerDto.accountNumber || "",
+        bankCode: customerDto.bankCode || "",
+        isSupplier: customerDto.isSupplier ?? false,
+        note: customerDto.note || "",
     };
 };
 
@@ -20,8 +24,12 @@ export const mapFormToCreateCustomerDto = (formData) => {
         city: formData.city,
         zip: formData.zip,
         phone: formData.phone,
-        ico: formData.ico,                    
-        isSupplier: formData.isSupplier,      
+        ico: formData.ico,
+        dic: formData.dic,
+        accountNumber: formData.accountNumber,
+        bankCode: formData.bankCode,
+        isSupplier: formData.isSupplier,
+        note: formData.note,
     };
 };
 
@@ -34,8 +42,12 @@ export const mapFormToUpdateCustomerDto = (formData) => {
     if (formData.city) dto.city = formData.city;
     if (formData.zip) dto.zip = formData.zip;
     if (formData.phone) dto.phone = formData.phone;
-    if (formData.ico) dto.ico = formData.ico;                        
-    if (formData.isSupplier !== undefined) dto.isSupplier = formData.isSupplier; 
+    if (formData.ico) dto.ico = formData.ico;
+    if (formData.dic) dto.dic = formData.dic;
+    if (formData.accountNumber) dto.accountNumber = formData.accountNumber;
+    if (formData.bankCode) dto.bankCode = formData.bankCode;
+    if (formData.isSupplier !== undefined) dto.isSupplier = formData.isSupplier;
+    if (formData.note !== undefined) dto.note = formData.note;
 
     return dto;
 };

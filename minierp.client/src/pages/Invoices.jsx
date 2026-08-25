@@ -4,18 +4,20 @@ import {
     getInvoiceById,
     updateInvoiceStatus,
     deleteInvoice,
-    
 } from "../services/invoiceService";
-import { getCustomers } from "../services/customerService";
-import {formatPrice } from '../utils/formatters'
+import { formatPrice, formatZip } from '../utils/formatters'
+import { printInvoice, shareInvoicePdfByEmail } from '../utils/invoicePrint'
+import InvoiceForm from "./InvoiceForm";
+import ConfirmModal from "../components/ConfirmModal";
 
 function Invoices({ view, user, setActivePage }) {
     const [invoices, setInvoices] = useState([]);
-    const [customers, setCustomers] = useState([]);
     const [selectedInvoice, setSelectedInvoice] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [emailPreparing, setEmailPreparing] = useState(false);
+    const [deleteTargetId, setDeleteTargetId] = useState(null);
 
     const getStatusBadgeClass = (status) => {
         switch (status?.toLowerCase()) {
@@ -31,12 +33,8 @@ function Invoices({ view, user, setActivePage }) {
     const loadData = useCallback(async () => {
         setLoading(true); 
         try {
-            const [invoicesData, customersData] = await Promise.all([
-                getInvoices(),
-                getCustomers(),
-            ]);
+            const invoicesData = await getInvoices();
             setInvoices(invoicesData);
-            setCustomers(customersData);
             setError(null);
         } catch (err) {
             setError(err.message);
@@ -46,9 +44,10 @@ function Invoices({ view, user, setActivePage }) {
     }, []);
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        loadData();
-    }, [loadData]);
+        if (view !== "add") {
+            loadData();
+        }
+    }, [view, loadData]);
    
     const handleOpenInvoice = async (invoiceId) => {
         try {
@@ -57,6 +56,25 @@ function Invoices({ view, user, setActivePage }) {
             setShowModal(true);
         } catch (err) {
             setError(err.message);
+        }
+    };
+
+    const handleCloseInvoiceModal = () => {
+        setShowModal(false);
+        setSelectedInvoice(null);
+    };
+
+    const handleEmailInvoice = async () => {
+        setEmailPreparing(true);
+        setError(null);
+        try {
+            await shareInvoicePdfByEmail(selectedInvoice);
+        } catch (err) {
+            if (err.name !== "AbortError") {
+                setError(err.message);
+            }
+        } finally {
+            setEmailPreparing(false);
         }
     };
 
@@ -78,30 +96,32 @@ function Invoices({ view, user, setActivePage }) {
         }
     };
 
-    const handleDeleteInvoice = async (id) => {
-        if (window.confirm("Opravdu chcete smazat tuto fakturu?")) {
-            try {
-                await deleteInvoice(id);
-                await loadData();
-                setShowModal(false);
-                setSelectedInvoice(null);
-                setError(null);
-            } catch (err) {
-                setError(err.message);
-            }
+    const handleDeleteInvoice = (id) => {
+        setDeleteTargetId(id);
+    };
+
+    const handleConfirmDelete = async () => {
+        const id = deleteTargetId;
+        setDeleteTargetId(null);
+        try {
+            await deleteInvoice(id);
+            await loadData();
+            setShowModal(false);
+            setSelectedInvoice(null);
+            setError(null);
+        } catch (err) {
+            setError(err.message);
         }
     };
   
     if (view === "add") {
         return (
-            <div className="alert alert-info">
-                <i className="bi bi-info-circle me-2"></i>
-                Faktury mohou být přidány pouze přes dodací list.
-                <br /><br />
-                <button className="btn btn-primary" onClick={() => setActivePage('Přidat DL')}>
-                    <i className="bi bi-arrow-left me-2"></i>Vytvoř nový Dodací List
-                </button>
-            </div>
+            <InvoiceForm
+                show
+                standalone
+                onClose={() => setActivePage("Seznam FV")}
+                onSuccess={() => setActivePage("Seznam FV")}
+            />
         );
     }
 
@@ -137,7 +157,7 @@ function Invoices({ view, user, setActivePage }) {
                         <tbody>
                             {invoices.map((invoice) => (
                                 <tr key={invoice.id}>
-                                    <td className="fw-bold text-dark">#{invoice.id}</td>
+                                    <td className="fw-bold text-dark">{invoice.invoiceNumber || `#${invoice.id}`}</td>
                                     <td>
                                         <div className="fw-bold text-dark">{invoice.customerName || "Unknown"}</div>
 
@@ -180,75 +200,155 @@ function Invoices({ view, user, setActivePage }) {
                     tabIndex="-1"
                     style={{ background: "rgba(0,0,0,0.5)" }}
                 >
-                    <div className="modal-dialog modal-lg">
+                    <div className="modal-dialog modal-lg modal-dialog-scrollable">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h5 className="modal-title">Číslo Faktury #{selectedInvoice.id}</h5>
-                                <button
-                                    className="btn-close"
-                                    onClick={() => setShowModal(false)}
-                                />
-                            </div>
-                            <div className="modal-body">
-                                <h6>Zákazník</h6>
-                                <p className="mb-0"><strong>{selectedInvoice.customer?.name}</strong></p>
-                                <p className="mb-0">{selectedInvoice.customer?.street}</p>
-                                <p className="mb-3">{selectedInvoice.customer?.city} {selectedInvoice.customer?.zip}</p>
-                             
-
-                                <h6>Položky</h6>
-                                <table className="table table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Zboží</th>
-                                            <th>Popis</th>
-                                            <th>Množství</th>
-                                            <th>Cena s DPH</th>
-                                            <th>Celkem</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {selectedInvoice.items.map((item, index) => (
-                                            <tr key={index}>
-                                                <td>{item.product?.brand} {item.product?.size} {item.product?.pattern}</td>
-                                                <td>{item.description}</td>
-                                                <td>{item.quantity}</td>
-                                                <td>{formatPrice(item.unitPrice)}</td>
-                                                <td>{formatPrice(item.totalPrice)}</td>
-                                            </tr>
-                                              
-                                        ))}
-                                    </tbody>
-                                </table>
-
-                                <div className="text-end mt-3 p-3 bg-light rounded">
-                                    <div>
-                                        Cena bez DPH:{" "}
-                                        <strong>
-                                            {formatPrice(selectedInvoice.totalAmountExVat)}{" "}
-                                           
-                                        </strong>
-                                    </div>
-                                    <div>
-                                        DPH 21%:{" "}
-                                        <strong>
-                                            {formatPrice(selectedInvoice.vatAmount)}{" "}
-                                            
-                                        </strong>
-                                    </div>
-                                    <div className="fs-5">
-                                        Celkem s DPH:{" "}
-                                        <strong>
-                                            {formatPrice(selectedInvoice.totalAmountIncVat)}{" "}
-                                        
-                                        </strong>
-                                    </div>
-                                </div>
-
-                                <div className="mt-3">
+                                <div>
+                                    <h5 className="modal-title mb-1">
+                                        Faktura {selectedInvoice.invoiceNumber || `#${selectedInvoice.id}`}
+                                    </h5>
                                     <span className={`badge ${getStatusBadgeClass(selectedInvoice.status)}`}>
                                         {selectedInvoice.status}
                                     </span>
+                                </div>
+                                <div className="d-flex align-items-center gap-2">
+                                    <button
+                                        className="btn btn-outline-primary btn-sm"
+                                        onClick={() => printInvoice(selectedInvoice)}
+                                    >
+                                        <i className="bi bi-printer me-2"></i>Tisk / PDF
+                                    </button>
+                                    <button
+                                        className="btn btn-outline-primary btn-sm"
+                                        onClick={handleEmailInvoice}
+                                        disabled={emailPreparing}
+                                    >
+                                        {emailPreparing ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                Připravuji...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <i className="bi bi-envelope me-2"></i>E-mail
+                                            </>
+                                        )}
+                                    </button>
+                                    <button
+                                        className="btn-close"
+                                        onClick={handleCloseInvoiceModal}
+                                    />
+                                </div>
+                            </div>
+                            <div className="modal-body p-4">
+                                {error && <div className="alert alert-danger">{error}</div>}
+
+                                <div className="row g-3 mb-4">
+                                    <div className="col-md-6">
+                                        <div className="border rounded p-3 h-100 bg-light">
+                                            <div className="small fw-bold text-uppercase text-muted mb-1">Dodavatel</div>
+                                            <div className="fw-bold">{selectedInvoice.supplier?.name || "—"}</div>
+                                            {selectedInvoice.supplier?.street && (
+                                                <div>{selectedInvoice.supplier.street}, {formatZip(selectedInvoice.supplier.zip)} {selectedInvoice.supplier.city}</div>
+                                            )}
+                                            {selectedInvoice.supplier?.ico && <div>IČO: {selectedInvoice.supplier.ico}</div>}
+                                            {selectedInvoice.supplier?.dic && <div>DIČ: {selectedInvoice.supplier.dic}</div>}
+                                            {selectedInvoice.supplier?.note && (
+                                                <div className="text-muted small mt-1">{selectedInvoice.supplier.note}</div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <div className="border rounded p-3 h-100 bg-light">
+                                            <div className="small fw-bold text-uppercase text-muted mb-1">Odběratel</div>
+                                            <div className="fw-bold">{selectedInvoice.customer?.name || "—"}</div>
+                                            {selectedInvoice.customer?.street && (
+                                                <div>{selectedInvoice.customer.street}, {formatZip(selectedInvoice.customer.zip)} {selectedInvoice.customer.city}</div>
+                                            )}
+                                            {selectedInvoice.customer?.ico && <div>IČO: {selectedInvoice.customer.ico}</div>}
+                                            {selectedInvoice.customer?.dic && <div>DIČ: {selectedInvoice.customer.dic}</div>}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="row g-3 mb-4">
+                                    <div className="col-md-3">
+                                        <div className="small fw-bold text-uppercase text-muted mb-1">Datum vystavení</div>
+                                        <div>{new Date(selectedInvoice.issueDate).toLocaleDateString('cs-CZ')}</div>
+                                    </div>
+                                    <div className="col-md-3">
+                                        <div className="small fw-bold text-uppercase text-muted mb-1">DUZP</div>
+                                        <div>{new Date(selectedInvoice.taxableSupplyDate).toLocaleDateString('cs-CZ')}</div>
+                                    </div>
+                                    <div className="col-md-3">
+                                        <div className="small fw-bold text-uppercase text-muted mb-1">Datum splatnosti</div>
+                                        <div>{new Date(selectedInvoice.dueDate).toLocaleDateString('cs-CZ')}</div>
+                                    </div>
+                                    <div className="col-md-3">
+                                        <div className="small fw-bold text-uppercase text-muted mb-1">Způsob platby</div>
+                                        <div>{selectedInvoice.paymentMethod || "—"}</div>
+                                    </div>
+                                </div>
+
+                                <div className="row g-3 mb-4">
+                                    <div className="col-md-6">
+                                        <div className="small fw-bold text-uppercase text-muted mb-1">Bankovní účet</div>
+                                        <div>{selectedInvoice.bankAccount || "—"}</div>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <div className="small fw-bold text-uppercase text-muted mb-1">Variabilní symbol</div>
+                                        <div>{selectedInvoice.variableSymbol || "—"}</div>
+                                    </div>
+                                </div>
+
+                                <div className="border-top pt-4 mt-4">
+                                    <h6 className="fw-bold mb-3">Položky faktury</h6>
+                                    <div className="table-responsive">
+                                        <table className="table table-hover align-middle mb-0">
+                                            <thead className="table-light">
+                                                <tr>
+                                                    <th>Položka</th>
+                                                    <th className="text-center">Množství</th>
+                                                    <th className="text-end">Jednotková cena</th>
+                                                    <th className="text-end">Sazba DPH</th>
+                                                    <th className="text-end">Celkem</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {selectedInvoice.items.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{item.description}</td>
+                                                        <td className="text-center">{item.quantity}</td>
+                                                        <td className="text-end">{formatPrice(item.unitPrice, selectedInvoice.currencyCode)}</td>
+                                                        <td className="text-end">{(item.vatRate * 100).toFixed(0)} %</td>
+                                                        <td className="text-end fw-bold">{formatPrice(item.totalPrice, selectedInvoice.currencyCode)}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div className="row mt-4">
+                                    <div className="col-md-6 ms-auto">
+                                        <div className="card bg-light border-0">
+                                            <div className="card-body">
+                                                <div className="d-flex justify-content-between mb-2">
+                                                    <span className="text-muted">Celkem bez DPH:</span>
+                                                    <span className="fw-bold">{formatPrice(selectedInvoice.totalAmountExVat, selectedInvoice.currencyCode)}</span>
+                                                </div>
+                                                <div className="d-flex justify-content-between mb-2">
+                                                    <span className="text-muted">DPH:</span>
+                                                    <span className="fw-bold">{formatPrice(selectedInvoice.vatAmount, selectedInvoice.currencyCode)}</span>
+                                                </div>
+                                                <hr />
+                                                <div className="d-flex justify-content-between align-items-center">
+                                                    <span className="h6 mb-0 fw-bold">Celkem s DPH:</span>
+                                                    <span className="h5 mb-0 fw-bold text-primary">{formatPrice(selectedInvoice.totalAmountIncVat, selectedInvoice.currencyCode)}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div className="modal-footer">
@@ -260,7 +360,7 @@ function Invoices({ view, user, setActivePage }) {
                                 </button>
                                 <button
                                     className="btn btn-outline-secondary"
-                                    onClick={() => setShowModal(false)}
+                                    onClick={handleCloseInvoiceModal}
                                 >
                                     Zavři
                                 </button>
@@ -269,6 +369,13 @@ function Invoices({ view, user, setActivePage }) {
                     </div>
                 </div>
             )}
+            <ConfirmModal
+                show={deleteTargetId !== null}
+                title="Smazat fakturu"
+                message="Opravdu chcete smazat tuto fakturu?"
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setDeleteTargetId(null)}
+            />
         </div>
     );
 }

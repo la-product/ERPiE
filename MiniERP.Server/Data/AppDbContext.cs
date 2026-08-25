@@ -16,7 +16,32 @@ namespace MiniERP.Server.Data {
         public DbSet<Receipt> Receipts { get; set; }
         public DbSet<ReceiptItem> ReceiptItems { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder) {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Invoice>()
+                .HasIndex(invoice => invoice.InvoiceNumber)
+                .IsUnique();
+
+            modelBuilder.Entity<Invoice>()
+                .HasOne(i => i.Customer)
+                .WithMany(c => c.Invoices)
+                .HasForeignKey(i => i.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Invoice>()
+                .HasOne(i => i.Supplier)
+                .WithMany()
+                .HasForeignKey(i => i.SupplierId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<InvoiceItem>()
+                .HasOne(ii => ii.Product)
+                .WithMany()
+                .HasForeignKey(ii => ii.ProductId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+        }
+
     }
 }
-
 

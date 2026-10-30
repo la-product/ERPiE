@@ -15,6 +15,7 @@
  * @property {string} bankAccount
  * @property {string} variableSymbol
  * @property {string} paymentMethod
+ * @property {string} note
  */
 
 /**
@@ -40,6 +41,7 @@
  * @property {string} bankAccount
  * @property {string} variableSymbol
  * @property {string} paymentMethod
+ * @property {string} note
  * @property {string} status
  * @property {Array<CreateInvoiceItemDTO>} items
  */
@@ -53,6 +55,7 @@
  * @property {number} [vatAmount]
  * @property {number} [totalAmountIncVat]
  * @property {string} [currencyCode]
+ * @property {string} [note]
  */
 
 /**
@@ -91,6 +94,7 @@
  * @property {number} vatAmount
  * @property {number} totalAmountIncVat
  * @property {string} currencyCode
+ * @property {string} note
  * @property {Object} [customer]
  * @property {Array<InvoiceItemDetailDTO>} items
  */

@@ -9,7 +9,7 @@ namespace MiniERP.Server.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class CustomerController : ControllerBase {
+public class CustomerController : OwnedEntityControllerBase {
     private readonly CustomerService _service;
     private readonly AresService _aresService;
 
@@ -20,7 +20,7 @@ public class CustomerController : ControllerBase {
 
     [HttpGet]
     public IActionResult Get() {
-        return Ok(_service.GetAll());
+        return Ok(_service.GetAll(CurrentUserId, IsAdmin));
     }
 
     [HttpGet("ares/{ico}")]
@@ -39,27 +39,27 @@ public class CustomerController : ControllerBase {
 
     [HttpGet("{id}")]
     public IActionResult GetById(int id) {
-        var dto = _service.GetById(id);
+        var dto = _service.GetById(id, CurrentUserId, IsAdmin);
         if (dto == null) return NotFound();
         return Ok(dto);
     }
 
     [HttpPost]
     public IActionResult Post(CreateCustomerDTO createDto) {
-        var dto = _service.Create(createDto);
+        var dto = _service.Create(createDto, CurrentUserId);
         return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
     }
 
     [HttpPut("{id}")]
     public IActionResult Put(int id, UpdateCustomerDTO updateDto) {
-        var dto = _service.Update(id, updateDto);
+        var dto = _service.Update(id, updateDto, CurrentUserId, IsAdmin);
         if (dto == null) return NotFound();
         return Ok(dto);
     }
 
     [HttpDelete("{id}")]
     public IActionResult Delete(int id) {
-        if (!_service.Delete(id)) return NotFound();
+        if (!_service.Delete(id, CurrentUserId, IsAdmin)) return NotFound();
         return NoContent();
     }
 }

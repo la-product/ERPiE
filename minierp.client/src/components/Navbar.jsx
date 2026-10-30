@@ -1,8 +1,16 @@
-function Navbar({ user, onLogout }) {
+function Navbar({ user, onLogout, onToggleMenu }) {
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm px-4 py-2">
             <div className="container-fluid p-0">
                 <div className="d-flex align-items-center">
+                    <button
+                        className="btn btn-link p-0 text-dark border-0 me-3 d-lg-none"
+                        onClick={onToggleMenu}
+                        aria-label="Otevřít menu"
+                        style={{ fontSize: '24px', lineHeight: 1 }}
+                    >
+                        <i className="bi bi-list"></i>
+                    </button>
                     <span className="badge bg-primary-light text-primary border-0 fw-semibold px-3 py-2 ms-2">
                         MiniERP System
                     </span>

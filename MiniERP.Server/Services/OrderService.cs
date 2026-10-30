@@ -13,27 +13,42 @@ public class OrderService {
         _context = context;
     }
 
-    public List<OrderDTO> GetAll() {
-        return _context.Orders
+    public List<OrderDTO> GetAll(string? currentUserId, bool isAdmin) {
+        var query = _context.Orders
             .Include(o => o.Customer)
             .Include(o => o.Items)
                 .ThenInclude(i => i.Product)
+            .AsQueryable();
+
+        if (!isAdmin) query = query.Where(o => o.Customer != null && o.Customer.OwnerId == currentUserId);
+
+        return query
             .AsEnumerable()
             .Select(OrderMapper.ToDto)
             .ToList();
     }
 
-    public OrderDetailDTO? GetById(int id) {
+    public OrderDetailDTO? GetById(int id, string? currentUserId, bool isAdmin) {
         var order = _context.Orders
             .Include(o => o.Customer)
             .Include(o => o.Items)
                 .ThenInclude(i => i.Product)
             .FirstOrDefault(o => o.Id == id);
 
-        return order == null ? null : OrderMapper.ToDetailDto(order);
+        if (order == null) return null;
+        if (!isAdmin && order.Customer?.OwnerId != currentUserId) return null;
+
+        return OrderMapper.ToDetailDto(order);
     }
 
-    public OrderDTO Create(CreateOrderDTO createDto) {
+    public OrderDTO? Create(CreateOrderDTO createDto, string? currentUserId, bool isAdmin) {
+        var customerOwnerId = _context.Customers
+            .Where(c => c.Id == createDto.CustomerId)
+            .Select(c => (string?)c.OwnerId)
+            .FirstOrDefault();
+
+        if (!isAdmin && customerOwnerId != currentUserId) return null;
+
         var order = OrderMapper.ToEntity(createDto);
 
         foreach (var itemDto in createDto.Items) {
@@ -58,18 +73,20 @@ public class OrderService {
         return OrderMapper.ToDto(order);
     }
 
-    public OrderDTO? Update(int id, UpdateOrderDTO updateDto) {
-        var order = _context.Orders.Find(id);
+    public OrderDTO? Update(int id, UpdateOrderDTO updateDto, string? currentUserId, bool isAdmin) {
+        var order = _context.Orders.Include(o => o.Customer).FirstOrDefault(o => o.Id == id);
         if (order == null) return null;
+        if (!isAdmin && order.Customer?.OwnerId != currentUserId) return null;
 
         OrderMapper.ApplyUpdate(order, updateDto);
         _context.SaveChanges();
         return OrderMapper.ToDto(order);
     }
 
-    public OrderDTO? UpdateStatus(int id, string status) {
-        var order = _context.Orders.Find(id);
+    public OrderDTO? UpdateStatus(int id, string status, string? currentUserId, bool isAdmin) {
+        var order = _context.Orders.Include(o => o.Customer).FirstOrDefault(o => o.Id == id);
         if (order == null) return null;
+        if (!isAdmin && order.Customer?.OwnerId != currentUserId) return null;
 
         order.Status = status;
         _context.SaveChanges();
@@ -98,12 +115,14 @@ public class OrderService {
             _context.SaveChanges();
     }
 
-    public bool Delete(int id) {
+    public bool Delete(int id, string? currentUserId, bool isAdmin) {
         var order = _context.Orders
+            .Include(o => o.Customer)
             .Include(o => o.Items)
             .FirstOrDefault(o => o.Id == id);
 
         if (order == null) return false;
+        if (!isAdmin && order.Customer?.OwnerId != currentUserId) return false;
 
         foreach (var item in order.Items) {
             var warehouseItem = _context.WarehouseItems

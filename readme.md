@@ -19,9 +19,11 @@ Projekt je aktivně vyvíjen jako miniERP systém pro prodejce pneumatik.
 ## Funkce
 
 ### Autentizace
-- [x] Přihlašování uživatelů
-- [x] Role uživatelů (admin / uživatel) — admin má přístup k editaci a mazání
-- [x] Správa uživatelských účtů
+- [x] Přihlašování uživatelů (JWT)
+- [x] Role uživatelů (admin / uživatel / demo) — admin má přístup k editaci a mazání
+- [x] Správa uživatelských účtů — vytváření nových uživatelů (`/api/user`), chráněno na backendu
+  (`[Authorize(Roles = "admin")]`), takže endpoint smí volat jen admin, ne jen skrytím v menu
+- [x] Data jsou oddělená per uživatel — viz sekce [Vlastnictví dat](#vlastnictví-dat) níže
 
 ### Adresář firem
 - [x] Seznam firem s filtrováním dle názvu a IČO
@@ -64,6 +66,14 @@ Projekt je aktivně vyvíjen jako miniERP systém pro prodejce pneumatik.
 - [x] Vytvoření faktury z dodacího listu
 - [x] Změna stavu faktury (nezaplaceno / zaplaceno)
 
+### Vlastnictví dat
+Firmy (`Customer`) mají sloupec `OwnerId` (FK na `AspNetUsers`). Každý neadmin uživatel vidí a
+upravuje jen firmy, které sám vytvořil — a v návaznosti na ně jen jejich faktury, dodací listy a
+příjemky (vazba přes `CustomerId`/`SupplierId`). Admin vidí a upravuje vše bez omezení. Produktový
+katalog a stav skladu zůstávají sdílené pro všechny uživatele. Filtrování řeší backend
+(`OwnedEntityControllerBase` + kontrola v jednotlivých service metodách), frontend žádnou logiku
+navíc neřeší — dostává už jen data, na která má přihlášený uživatel právo.
+
 ## Struktura projektu
 
 ```
@@ -71,6 +81,8 @@ MiniERP/
 ├── MiniERP.Server/               # ASP.NET Core backend
 │   ├── Controllers/
 │   │   ├── AuthController.cs
+│   │   ├── UserController.cs
+│   │   ├── OwnedEntityControllerBase.cs   # sdílené CurrentUserId/IsAdmin pro filtrování dat
 │   │   ├── CustomerController.cs
 │   │   ├── ProductsController.cs
 │   │   ├── OrderController.cs
@@ -79,7 +91,7 @@ MiniERP/
 │   │   └── ReceiptController.cs
 │   ├── Models/
 │   │   ├── User.cs
-│   │   ├── Customer.cs
+│   │   ├── Customer.cs                    # vč. OwnerId (FK na AspNetUsers)
 │   │   ├── Product.cs
 │   │   ├── Order.cs
 │   │   ├── OrderItem.cs
@@ -149,18 +161,20 @@ Frontend běží na `http://localhost:5173`.
 | Metoda | Endpoint | Popis |
 |--------|----------|-------|
 | POST | `/api/auth/login` | Přihlášení uživatele |
-| GET/POST | `/api/customer` | Seznam / přidání firmy |
-| PUT/DELETE | `/api/customer/{id}` | Úprava / smazání firmy |
-| GET/POST | `/api/products` | Seznam / přidání produktu |
+| GET/POST | `/api/user` | Seznam / vytvoření uživatele — **jen admin** (`[Authorize(Roles = "admin")]`) |
+| GET/POST | `/api/customer` | Seznam / přidání firmy — filtrováno podle vlastníka (admin vidí vše) |
+| GET | `/api/customer/ares/{ico}` | Načtení firmy z ARESu podle IČO |
+| PUT/DELETE | `/api/customer/{id}` | Úprava / smazání firmy — jen vlastník nebo admin |
+| GET/POST | `/api/products` | Seznam / přidání produktu (sdílené, bez filtrování) |
 | PUT/DELETE | `/api/products/{id}` | Úprava / smazání produktu |
-| GET/POST | `/api/order` | Seznam / vytvoření DL |
+| GET/POST | `/api/order` | Seznam / vytvoření DL — filtrováno přes vlastníka navázané firmy |
 | PUT | `/api/order/{id}/status` | Změna stavu DL |
-| GET/POST | `/api/invoice` | Seznam / vytvoření faktury |
+| GET/POST | `/api/invoice` | Seznam / vytvoření faktury — filtrováno přes vlastníka navázané firmy |
 | PUT | `/api/invoice/{id}/status` | Změna stavu faktury |
-| GET | `/api/warehouse` | Stav skladu |
+| GET | `/api/warehouse` | Stav skladu (sdílené, bez filtrování) |
 | PUT/DELETE | `/api/warehouse/{id}` | Úprava / odebrání položky skladu |
-| GET/POST | `/api/receipt` | Seznam / vytvoření příjemky |
+| GET/POST | `/api/receipt` | Seznam / vytvoření příjemky — filtrováno přes vlastníka dodavatele |
 | DELETE | `/api/receipt/{id}` | Smazání příjemky |
-| POST | `/api/receipt/import-invoice` | Import PDF faktury přes AI — vrací extrahovaná a spárovaná data pro předvyplnění příjemky |
+| POST | `/api/receipt/import-invoice` | Import PDF faktury přes AI — spárování dodavatelů se omezuje jen na vlastní |
 
 

@@ -17,16 +17,21 @@ public class InvoiceService {
         return GenerateNextInvoiceNumber();
     }
 
-    public List<InvoiceDTO> GetAll() {
-        return _context.Invoices
+    public List<InvoiceDTO> GetAll(string? currentUserId, bool isAdmin) {
+        var query = _context.Invoices
             .Include(i => i.Customer)
             .Include(i => i.Items)
+            .AsQueryable();
+
+        if (!isAdmin) query = query.Where(i => i.Customer.OwnerId == currentUserId);
+
+        return query
             .AsEnumerable()
             .Select(InvoiceMapper.ToDto)
             .ToList();
     }
 
-    public InvoiceDetailDTO? GetById(int id) {
+    public InvoiceDetailDTO? GetById(int id, string? currentUserId, bool isAdmin) {
         var invoice = _context.Invoices
             .Include(i => i.Customer)
             .Include(i => i.Supplier)
@@ -34,10 +39,20 @@ public class InvoiceService {
                 .ThenInclude(ii => ii.Product)
             .FirstOrDefault(i => i.Id == id);
 
-        return invoice == null ? null : InvoiceMapper.ToDetailDto(invoice);
+        if (invoice == null) return null;
+        if (!isAdmin && invoice.Customer.OwnerId != currentUserId) return null;
+
+        return InvoiceMapper.ToDetailDto(invoice);
     }
 
-    public InvoiceDTO Create(CreateInvoiceDTO createDto) {
+    public InvoiceDTO? Create(CreateInvoiceDTO createDto, string? currentUserId, bool isAdmin) {
+        var customerOwnerId = _context.Customers
+            .Where(c => c.Id == createDto.CustomerId)
+            .Select(c => (string?)c.OwnerId)
+            .FirstOrDefault();
+
+        if (!isAdmin && customerOwnerId != currentUserId) return null;
+
         var invoice = InvoiceMapper.ToEntity(createDto);
 
         foreach (var itemDto in createDto.Items) {
@@ -85,30 +100,34 @@ public class InvoiceService {
     private static bool IsDuplicateInvoiceNumber(DbUpdateException ex) =>
         ex.InnerException is MySqlException { Number: 1062 };
 
-    public InvoiceDTO? Update(int id, UpdateInvoiceDTO updateDto) {
-        var invoice = _context.Invoices.Find(id);
+    public InvoiceDTO? Update(int id, UpdateInvoiceDTO updateDto, string? currentUserId, bool isAdmin) {
+        var invoice = _context.Invoices.Include(i => i.Customer).FirstOrDefault(i => i.Id == id);
         if (invoice == null) return null;
+        if (!isAdmin && invoice.Customer.OwnerId != currentUserId) return null;
 
         InvoiceMapper.ApplyUpdate(invoice, updateDto);
         _context.SaveChanges();
         return InvoiceMapper.ToDto(invoice);
     }
 
-    public InvoiceDTO? UpdateStatus(int id, string status) {
-        var invoice = _context.Invoices.Find(id);
+    public InvoiceDTO? UpdateStatus(int id, string status, string? currentUserId, bool isAdmin) {
+        var invoice = _context.Invoices.Include(i => i.Customer).FirstOrDefault(i => i.Id == id);
         if (invoice == null) return null;
+        if (!isAdmin && invoice.Customer.OwnerId != currentUserId) return null;
 
         invoice.Status = status;
         _context.SaveChanges();
         return InvoiceMapper.ToDto(invoice);
     }
 
-    public bool Delete(int id) {
+    public bool Delete(int id, string? currentUserId, bool isAdmin) {
         var invoice = _context.Invoices
+            .Include(i => i.Customer)
             .Include(i => i.Items)
             .FirstOrDefault(i => i.Id == id);
 
         if (invoice == null) return false;
+        if (!isAdmin && invoice.Customer.OwnerId != currentUserId) return false;
 
         _context.Invoices.Remove(invoice);
         _context.SaveChanges();

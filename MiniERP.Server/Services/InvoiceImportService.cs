@@ -55,7 +55,7 @@ public class InvoiceImportService {
         _context = context;
     }
 
-    public async Task<InvoiceImportDTO> ExtractFromPdfAsync(byte[] pdfBytes) {
+    public async Task<InvoiceImportDTO> ExtractFromPdfAsync(byte[] pdfBytes, string? currentUserId, bool isAdmin) {
         var client = new Client();
 
         var content = new Content {
@@ -86,11 +86,13 @@ public class InvoiceImportService {
         var extracted = JsonSerializer.Deserialize<InvoiceExtractionResult>(text)
             ?? throw new InvalidOperationException("Odpověď modelu se nepodařilo zpracovat.");
 
-        return MatchToExistingData(extracted);
+        return MatchToExistingData(extracted, currentUserId, isAdmin);
     }
 
-    private InvoiceImportDTO MatchToExistingData(InvoiceExtractionResult extracted) {
-        var suppliers = _context.Customers.Where(c => c.IsSupplier).ToList();
+    private InvoiceImportDTO MatchToExistingData(InvoiceExtractionResult extracted, string? currentUserId, bool isAdmin) {
+        var suppliersQuery = _context.Customers.Where(c => c.IsSupplier);
+        if (!isAdmin) suppliersQuery = suppliersQuery.Where(c => c.OwnerId == currentUserId);
+        var suppliers = suppliersQuery.ToList();
         var matchedSupplier = FindBestMatch(extracted.SupplierName, suppliers, s => s.Name);
 
         var products = _context.Products.ToList();

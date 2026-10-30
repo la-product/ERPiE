@@ -6,19 +6,23 @@
     import Products from './pages/Products';
     import Orders from './pages/Orders';
     import Invoices from './pages/Invoices';
+    import PurchaseInvoices from './pages/PurchaseInvoices';
     import Users from './pages/Users';
     import Login from './pages/Login';
     import Warehouse from './pages/Warehouse';
     import Receipts from './pages/Receipts';
+    import Overview from './pages/Overview';
 
     function App() {
         const [user, setUser] = useState(() => restoreSession());
         const [isAuthenticated, setIsAuthenticated] = useState(() => restoreSession() !== null);
-        const [activePage, setActivePage] = useState('Customer list');
+        const [activePage, setActivePage] = useState('Přehled');
+        const [selectedPurchaseInvoiceId, setSelectedPurchaseInvoiceId] = useState(null);
 
         const handleLogin = (userData) => {
             setUser(userData);
             setIsAuthenticated(true);
+            setActivePage('Přehled');
         };
 
         const handleLogout = () => {
@@ -52,6 +56,7 @@
 
         const renderPage = () => {
             switch (activePage) {
+                case 'Přehled': return <Overview />;
                 case 'Seznam firem': return <Customers view="list" setActivePage={setActivePage} user={user} />;
                 case 'Přidat firmu': return <Customers view="add" setActivePage={setActivePage} />;
                 case 'Seznam produktů': return <Products view="list" products={products} setProducts={setProducts} loading={productsLoading} setLoading={setProductsLoading} setActivePage={setActivePage} user={user} />;
@@ -61,8 +66,11 @@
                 case 'Vytvořit příjemku': return <Receipts view="add" products={products} setActivePage={setActivePage} user={user} />;
                 case 'Seznam DL': return <Orders view="list" products={products} setProducts={setProducts} setActivePage={setActivePage} user={user} />;
                 case 'Přidat DL': return <Orders view="add" products={products} setProducts={setProducts} setActivePage={setActivePage} />;
-                case 'Seznam FV': return <Invoices view="list" user={user} setActivePage={setActivePage} />;
+                case 'Faktury vystavené': return <Invoices view="list" user={user} setActivePage={setActivePage} />;
                 case 'Přidat FV': return <Invoices view="add" setActivePage={setActivePage} />;
+                case 'Faktury došlé': return <PurchaseInvoices view="list" user={user} setActivePage={setActivePage} onEditPurchaseInvoice={(id) => { setSelectedPurchaseInvoiceId(id); setActivePage('Upravit fakturu došlou'); }} />;
+                case 'Přidat fakturu došlou': return <PurchaseInvoices view="add" setActivePage={setActivePage} />;
+                case 'Upravit fakturu došlou': return <PurchaseInvoices view="edit" invoiceId={selectedPurchaseInvoiceId} setActivePage={setActivePage} />;
                 case 'Seznam uživatelů': return user?.role === 'admin' ? <Users view="list" setActivePage={setActivePage} /> : null;
                 case 'Přidat uživatele': return user?.role === 'admin' ? <Users view="add" setActivePage={setActivePage} /> : null;
                 default: return null;

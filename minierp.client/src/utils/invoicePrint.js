@@ -170,6 +170,22 @@ const INVOICE_DOC_STYLE = `
     .invoice-doc .qr-block { display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .invoice-doc .qr-block img { width: 100px; height: 100px; }
     .invoice-doc .qr-block .qr-caption { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; }
+    .invoice-doc .note-section { margin-bottom: 20px; }
+    .invoice-doc .note-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+    .invoice-doc .note-block {
+        border: 1px solid #d0d9e2;
+        border-radius: 8px;
+        padding: 6px 10px;
+        white-space: pre-wrap;
+        text-align: left;
+    }
     .invoice-doc .vat-table { width: 320px; }
     .invoice-doc .totals-box { width: 280px; border: 1px solid #d0d9e2; border-radius: 8px; padding: 14px 16px; }
     .invoice-doc .totals-box .line { display: flex; justify-content: space-between; margin-bottom: 6px; }
@@ -267,6 +283,13 @@ const buildInvoiceBodyHtml = async (invoice) => {
                     <div class="value">${escapeHtml(invoice.variableSymbol || "—")}</div>
                 </div>
             </div>
+
+            ${invoice.note ? `
+                <div class="note-section">
+                    <div class="note-title">Poznámka</div>
+                    <div class="note-block">${escapeHtml(invoice.note)}</div>
+                </div>
+            ` : ""}
 
             <table>
                 <thead>

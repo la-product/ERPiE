@@ -53,7 +53,9 @@ public class Program {
         builder.Services.AddScoped<ProductService>();
         builder.Services.AddScoped<OrderService>();
         builder.Services.AddScoped<InvoiceService>();
+        builder.Services.AddScoped<PurchaseInvoiceService>();
         builder.Services.AddScoped<CustomerService>();
+        builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<WarehouseService>();
         builder.Services.AddScoped<ReceiptService>();
         builder.Services.AddScoped<InvoiceImportService>();

@@ -32,6 +32,7 @@ const createDefaultInvoiceForm = () => {
         bankAccount: "",
         variableSymbol: "",
         paymentMethod: "Bankovní převod",
+        note: "",
     };
 };
 
@@ -306,6 +307,7 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess, standalone = fal
                 bankAccount: form.bankAccount,
                 variableSymbol: form.variableSymbol,
                 paymentMethod: form.paymentMethod,
+                note: form.note,
                 totalAmountExVat: form.totalAmountExVat,
                 vatAmount: form.vatAmount,
                 totalAmountIncVat: form.totalAmountIncVat,
@@ -570,6 +572,18 @@ function InvoiceForm({ show, selectedOrder, onClose, onSuccess, standalone = fal
                                     </select>
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="border-top pt-4 mt-4">
+                            <h6 className="fw-bold mb-3">Poznámka</h6>
+                            <textarea
+                                className="form-control"
+                                rows="3"
+                                placeholder="Poznámka k faktuře (zobrazí se i na PDF)"
+                                value={form.note}
+                                onChange={(e) => setForm({ ...form, note: e.target.value })}
+                                disabled={loading}
+                            />
                         </div>
 
                         <div className="border-top pt-4 mt-4">

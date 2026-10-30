@@ -15,6 +15,7 @@ public class Customer {
     public string BankCode { get; set; } = string.Empty;
     public bool IsSupplier { get; set; } = false;
     public string Note { get; set; } = string.Empty;
+    public string? OwnerId { get; set; }
     public List<Order> Orders { get; set; } = new();
     public List<Invoice> Invoices { get; set; } = new();
 }

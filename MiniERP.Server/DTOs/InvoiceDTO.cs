@@ -18,6 +18,7 @@ public class InvoiceDTO
     public string BankAccount { get; set; } = string.Empty;
     public string VariableSymbol { get; set; } = string.Empty;
     public string PaymentMethod { get; set; } = string.Empty;
+    public string Note { get; set; } = string.Empty;
 }
 
 public class CreateInvoiceDTO
@@ -34,6 +35,7 @@ public class CreateInvoiceDTO
     public string BankAccount { get; set; } = string.Empty;
     public string VariableSymbol { get; set; } = string.Empty;
     public string PaymentMethod { get; set; } = string.Empty;
+    public string Note { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public List<CreateInvoiceItemDTO> Items { get; set; } = new();
 }
@@ -52,6 +54,7 @@ public class UpdateInvoiceDTO
     public string? BankAccount { get; set; }
     public string? VariableSymbol { get; set; }
     public string? PaymentMethod { get; set; }
+    public string? Note { get; set; }
 }
 
 public class InvoiceDetailDTO
@@ -71,6 +74,7 @@ public class InvoiceDetailDTO
     public string BankAccount { get; set; } = string.Empty;
     public string VariableSymbol { get; set; } = string.Empty;
     public string PaymentMethod { get; set; } = string.Empty;
+    public string Note { get; set; } = string.Empty;
     public CustomerDTO? Customer { get; set; }
     public CustomerDTO? Supplier { get; set; }
     public List<InvoiceItemDetailDTO> Items { get; set; } = new();

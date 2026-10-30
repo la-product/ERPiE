@@ -14,27 +14,38 @@ public class ReceiptService {
         _context = context;
     }
 
-    public List<ReceiptDTO> GetAll() {
-        return _context.Receipts
+    public List<ReceiptDTO> GetAll(string? currentUserId, bool isAdmin) {
+        var query = _context.Receipts
             .Include(r => r.Supplier)
+            .AsQueryable();
+
+        if (!isAdmin) query = query.Where(r => r.Supplier != null && r.Supplier.OwnerId == currentUserId);
+
+        return query
             .AsEnumerable()
             .Select(ReceiptMapper.ToDto)
             .ToList();
     }
 
-    public ReceiptDetailDTO? GetById(int id) {
+    public ReceiptDetailDTO? GetById(int id, string? currentUserId, bool isAdmin) {
         var receipt = _context.Receipts
             .Include(r => r.Supplier)
             .Include(r => r.Items)
                 .ThenInclude(i => i.Product)
             .FirstOrDefault(r => r.Id == id);
 
-        return receipt == null ? null : ReceiptMapper.ToDetailDto(receipt);
+        if (receipt == null) return null;
+        if (!isAdmin && receipt.Supplier?.OwnerId != currentUserId) return null;
+
+        return ReceiptMapper.ToDetailDto(receipt);
     }
 
-    public ReceiptDTO? Create(CreateReceiptDTO createDto) {
-        var supplierExists = _context.Customers.Any(c => c.Id == createDto.SupplierId && c.IsSupplier);
-        if (!supplierExists) return null;
+    public ReceiptDTO? Create(CreateReceiptDTO createDto, string? currentUserId, bool isAdmin) {
+        var supplier = _context.Customers
+            .FirstOrDefault(c => c.Id == createDto.SupplierId && c.IsSupplier);
+
+        if (supplier == null) return null;
+        if (!isAdmin && supplier.OwnerId != currentUserId) return null;
 
         double totalExVat = 0;
 
@@ -88,12 +99,14 @@ public class ReceiptService {
         return ReceiptMapper.ToDto(receipt);
     }
 
-    public bool Delete(int id) {
+    public bool Delete(int id, string? currentUserId, bool isAdmin) {
         var receipt = _context.Receipts
+            .Include(r => r.Supplier)
             .Include(r => r.Items)
             .FirstOrDefault(r => r.Id == id);
 
         if (receipt == null) return false;
+        if (!isAdmin && receipt.Supplier?.OwnerId != currentUserId) return false;
 
         foreach (var item in receipt.Items) {
             var warehouseItem = _context.WarehouseItems

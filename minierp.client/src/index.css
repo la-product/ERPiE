@@ -328,6 +328,16 @@ textarea::placeholder {
     color: #dc2626;
 }
 
+input.no-spinner::-webkit-outer-spin-button,
+input.no-spinner::-webkit-inner-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}
+
+input.no-spinner {
+    -moz-appearance: textfield;
+}
+
 /* Alert Styling */
 .alert {
     border-radius: 8px;
@@ -462,6 +472,24 @@ textarea::placeholder {
         border-radius: 6px;
         padding: 0.5rem 1rem;
         font-size: 0.95rem;
+    }
+}
+
+/* Sidebar becomes an off-canvas drawer below the Bootstrap "lg" breakpoint,
+   matching the burger toggle's d-lg-none visibility. */
+@media (max-width: 991.98px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease-in-out;
+        z-index: 1045;
+    }
+
+    .sidebar.sidebar-open {
+        transform: translateX(0);
     }
 }
 

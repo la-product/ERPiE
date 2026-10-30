@@ -8,7 +8,7 @@ namespace MiniERP.Server.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class OrderController : ControllerBase {
+public class OrderController : OwnedEntityControllerBase {
     private readonly OrderService _service;
 
     public OrderController(OrderService service) {
@@ -17,39 +17,40 @@ public class OrderController : ControllerBase {
 
     [HttpGet]
     public IActionResult Get() {
-        return Ok(_service.GetAll());
+        return Ok(_service.GetAll(CurrentUserId, IsAdmin));
     }
 
     [HttpGet("{id}")]
     public IActionResult GetById(int id) {
-        var dto = _service.GetById(id);
+        var dto = _service.GetById(id, CurrentUserId, IsAdmin);
         if (dto == null) return NotFound();
         return Ok(dto);
     }
 
     [HttpPost]
     public IActionResult Post(CreateOrderDTO createDto) {
-        var dto = _service.Create(createDto);
+        var dto = _service.Create(createDto, CurrentUserId, IsAdmin);
+        if (dto == null) return BadRequest(new { message = "Zákazník neexistuje nebo k němu nemáte přístup." });
         return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
     }
 
     [HttpPut("{id}")]
     public IActionResult Put(int id, UpdateOrderDTO updateDto) {
-        var dto = _service.Update(id, updateDto);
+        var dto = _service.Update(id, updateDto, CurrentUserId, IsAdmin);
         if (dto == null) return NotFound();
         return Ok(dto);
     }
 
     [HttpPut("{id}/status")]
     public IActionResult UpdateStatus(int id, [FromBody] string status) {
-        var dto = _service.UpdateStatus(id, status);
+        var dto = _service.UpdateStatus(id, status, CurrentUserId, IsAdmin);
         if (dto == null) return NotFound();
         return Ok(dto);
     }
 
     [HttpDelete("{id}")]
     public IActionResult Delete(int id) {
-        if (!_service.Delete(id)) return NotFound();
+        if (!_service.Delete(id, CurrentUserId, IsAdmin)) return NotFound();
         return NoContent();
     }
 }

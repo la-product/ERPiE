@@ -27,6 +27,7 @@ public class Invoice {
     public string BankAccount { get; set; } = string.Empty;
     public string VariableSymbol { get; set; } = string.Empty;
     public string PaymentMethod { get; set; } = string.Empty;
+    public string Note { get; set; } = string.Empty;
     public ICollection<InvoiceItem> Items { get; set; } = new List<InvoiceItem>();
 
 }

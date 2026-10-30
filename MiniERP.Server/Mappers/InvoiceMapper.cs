@@ -22,7 +22,8 @@ public static class InvoiceMapper
         CurrencyCode = i.CurrencyCode,
         BankAccount = i.BankAccount,
         VariableSymbol = i.VariableSymbol,
-        PaymentMethod = i.PaymentMethod
+        PaymentMethod = i.PaymentMethod,
+        Note = i.Note
     };
 
     public static InvoiceDetailDTO ToDetailDto(Invoice i) => new()
@@ -42,6 +43,7 @@ public static class InvoiceMapper
         BankAccount = i.BankAccount,
         VariableSymbol = i.VariableSymbol,
         PaymentMethod = i.PaymentMethod,
+        Note = i.Note,
         Customer = i.Customer != null ? CustomerMapper.ToDto(i.Customer) : null,
         Supplier = i.Supplier != null ? CustomerMapper.ToDto(i.Supplier) : null,
         Items = i.Items.Select(InvoiceItemMapper.ToDetailDto).ToList()
@@ -61,7 +63,8 @@ public static class InvoiceMapper
         CurrencyCode = dto.CurrencyCode,
         BankAccount = dto.BankAccount,
         VariableSymbol = dto.VariableSymbol,
-        PaymentMethod = dto.PaymentMethod
+        PaymentMethod = dto.PaymentMethod,
+        Note = dto.Note
     };
 
     public static void ApplyUpdate(Invoice invoice, UpdateInvoiceDTO dto)
@@ -78,5 +81,6 @@ public static class InvoiceMapper
         if (dto.BankAccount != null) invoice.BankAccount = dto.BankAccount;
         if (dto.VariableSymbol != null) invoice.VariableSymbol = dto.VariableSymbol;
         if (dto.PaymentMethod != null) invoice.PaymentMethod = dto.PaymentMethod;
+        if (dto.Note != null) invoice.Note = dto.Note;
     }
 }

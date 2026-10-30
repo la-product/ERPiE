@@ -19,6 +19,7 @@ export const mapInvoiceDtoToForm = (invoiceDto) => {
         bankAccount: invoiceDto.bankAccount || "",
         variableSymbol: invoiceDto.variableSymbol || "",
         paymentMethod: invoiceDto.paymentMethod || "",
+        note: invoiceDto.note || "",
         status: invoiceDto.status || "",
     };
 };
@@ -43,6 +44,7 @@ export const mapFormToCreateInvoiceDto = (formData, items) => {
         bankAccount: formData.bankAccount,
         variableSymbol: formData.variableSymbol,
         paymentMethod: formData.paymentMethod,
+        note: formData.note || "",
         status: formData.status || "",
         items: items.map((item) => ({
             description: item.description,
@@ -76,6 +78,7 @@ export const mapFormToUpdateInvoiceDto = (formData) => {
     if (formData.bankAccount) dto.bankAccount = formData.bankAccount;
     if (formData.variableSymbol) dto.variableSymbol = formData.variableSymbol;
     if (formData.paymentMethod) dto.paymentMethod = formData.paymentMethod;
+    if (formData.note) dto.note = formData.note;
 
     return dto;
 };

@@ -119,8 +119,8 @@ function Invoices({ view, user, setActivePage }) {
             <InvoiceForm
                 show
                 standalone
-                onClose={() => setActivePage("Seznam FV")}
-                onSuccess={() => setActivePage("Seznam FV")}
+                onClose={() => setActivePage("Faktury vystavené")}
+                onSuccess={() => setActivePage("Faktury vystavené")}
             />
         );
     }

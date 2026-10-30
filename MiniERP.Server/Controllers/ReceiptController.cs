@@ -8,7 +8,7 @@ namespace MiniERP.Server.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class ReceiptController : ControllerBase {
+public class ReceiptController : OwnedEntityControllerBase {
     private readonly ReceiptService _service;
     private readonly InvoiceImportService _invoiceImportService;
 
@@ -19,26 +19,26 @@ public class ReceiptController : ControllerBase {
 
     [HttpGet]
     public IActionResult Get() {
-        return Ok(_service.GetAll());
+        return Ok(_service.GetAll(CurrentUserId, IsAdmin));
     }
 
     [HttpGet("{id}")]
     public IActionResult GetById(int id) {
-        var dto = _service.GetById(id);
+        var dto = _service.GetById(id, CurrentUserId, IsAdmin);
         if (dto == null) return NotFound();
         return Ok(dto);
     }
 
     [HttpPost]
     public IActionResult Post(CreateReceiptDTO createDto) {
-        var dto = _service.Create(createDto);
-        if (dto == null) return BadRequest("Dodavatel neexistuje nebo není označen jako dodavatel.");
+        var dto = _service.Create(createDto, CurrentUserId, IsAdmin);
+        if (dto == null) return BadRequest("Dodavatel neexistuje, není označen jako dodavatel, nebo k němu nemáte přístup.");
         return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
     }
 
     [HttpDelete("{id}")]
     public IActionResult Delete(int id) {
-        if (!_service.Delete(id)) return NotFound();
+        if (!_service.Delete(id, CurrentUserId, IsAdmin)) return NotFound();
         return NoContent();
     }
 
@@ -54,7 +54,7 @@ public class ReceiptController : ControllerBase {
         await file.CopyToAsync(ms);
 
         try {
-            var result = await _invoiceImportService.ExtractFromPdfAsync(ms.ToArray());
+            var result = await _invoiceImportService.ExtractFromPdfAsync(ms.ToArray(), CurrentUserId, IsAdmin);
             return Ok(result);
         } catch (Exception ex) {
             return StatusCode(502, $"Nepodařilo se zpracovat fakturu: {ex.Message}");
